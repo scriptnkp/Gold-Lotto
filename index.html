@@ -22,7 +22,7 @@
          ตั้งค่า URL ของ Google Apps Script ที่นี่ 
          ============================================== -->
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTref3UUuGXru43ETSFCJIuQTBPS8MeVXYQUC7q8yPYrN3mqZsio4bEk3SLMJn0SUmEg/exec'; // <--- เอา URL Web App มาใส่ตรงนี้
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzTref3UUuGXru43ETSFCJIuQTBPS8MeVXYQUC7q8yPYrN3mqZsio4bEk3SLMJn0SUmEg/exec';
     </script>
 
     <!-- Navbar -->
@@ -176,9 +176,6 @@
 
         async function handleAuth(e) {
             e.preventDefault();
-            if(SCRIPT_URL.includes('AKfy')) {
-                showToast('กรุณาเปลี่ยน SCRIPT_URL ในโค้ดก่อนใช้งานจริง', 'error');
-            }
 
             const mode = document.getElementById('auth-mode').value;
             const user = document.getElementById('username').value;
