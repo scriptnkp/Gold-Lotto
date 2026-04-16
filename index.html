@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบขายเบอร์ทองออนไลน์</title>
+    <!-- ใช้ Tailwind CSS เพื่อความสวยงามและ Responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
+        body { font-family: 'Kanit', sans-serif; background-color: #f3f4f6; }
+        .toast-enter { transform: translateY(100%); opacity: 0; }
+        .toast-enter-active { transform: translateY(0); opacity: 1; transition: all 0.3s ease; }
+        .toast-exit { transform: translateY(0); opacity: 1; }
+        .toast-exit-active { transform: translateY(-100%); opacity: 0; transition: all 0.3s ease; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- ==============================================
+         ตั้งค่า URL ของ Google Apps Script ที่นี่ 
+         ============================================== -->
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycE65u1e8tPz_Xw_r1aYv_wG_xQj_yVv_v/exec'; // <--- เอา URL Web App มาใส่ตรงนี้
+    </script>
+
+    <!-- Navbar -->
+    <nav class="bg-yellow-500 shadow-lg p-4 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold"><i class="fas fa-coins text-yellow-200"></i> โชคดีเบอร์ทอง</h1>
+            <div id="nav-user-info" class="hidden flex items-center gap-4">
+                <span id="display-username" class="font-medium"></span>
+                <span id="display-role" class="bg-yellow-700 text-xs px-2 py-1 rounded-full uppercase"></span>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition">ออกจากระบบ</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 mt-6">
+        
+        <!-- Loading Overlay -->
+        <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                <i class="fas fa-spinner fa-spin text-4xl text-yellow-500 mb-4"></i>
+                <p class="font-medium">กำลังประมวลผล...</p>
+            </div>
+        </div>
+
+        <!-- Section: Login / Register -->
+        <div id="auth-section" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md mt-10">
+            <div class="flex justify-center mb-6">
+                <button id="tab-login" onclick="switchTab('login')" class="px-4 py-2 border-b-2 border-yellow-500 font-bold text-yellow-600">เข้าสู่ระบบ</button>
+                <button id="tab-register" onclick="switchTab('register')" class="px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-yellow-600">สมัครสมาชิก</button>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuth(event)">
+                <input type="hidden" id="auth-mode" value="login">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">ชื่อผู้ใช้ (Username)</label>
+                    <input type="text" id="username" required class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-1">รหัสผ่าน (Password)</label>
+                    <input type="password" id="password" required class="w-full border rounded p-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                </div>
+                <button type="submit" id="auth-btn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition">เข้าสู่ระบบ</button>
+            </form>
+        </div>
+
+        <!-- Section: Main Application (Dashboard) -->
+        <div id="app-section" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h2 class="text-xl font-bold"><i class="fas fa-th"></i> กระดานเบอร์ทอง 00-99</h2>
+                
+                <div class="flex gap-2 items-center">
+                    <div class="flex items-center gap-1"><span class="w-4 h-4 bg-green-100 border border-green-500 inline-block rounded"></span> ว่าง</div>
+                    <div class="flex items-center gap-1"><span class="w-4 h-4 bg-red-100 border border-red-500 inline-block rounded"></span> ขายแล้ว</div>
+                    <button onclick="fetchNumbers()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded ml-4"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
+                </div>
+            </div>
+
+            <!-- Admin Controls -->
+            <div id="admin-controls" class="hidden bg-red-50 border border-red-200 p-4 rounded-lg mb-6 flex justify-between items-center">
+                <span class="text-red-800 font-bold"><i class="fas fa-user-shield"></i> เมนูผู้ดูแลระบบ</span>
+                <button onclick="resetBoard()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">ล้างกระดาน (เริ่มรอบใหม่)</button>
+            </div>
+
+            <!-- Numbers Grid -->
+            <div id="numbers-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-3">
+                <!-- เบอร์จะถูกสร้างด้วย Javascript ที่นี่ -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- Modal for Purchase Confirmation -->
+    <div id="buy-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <h3 class="text-xl font-bold mb-4 text-center">ยืนยันการซื้อเบอร์</h3>
+            <div class="text-center mb-6">
+                <span class="text-5xl font-bold text-yellow-500" id="modal-number-display">00</span>
+            </div>
+            <p class="text-center text-gray-600 mb-6">คุณต้องการซื้อเบอร์นี้ใช่หรือไม่?</p>
+            <div class="flex justify-center gap-4">
+                <button onclick="closeBuyModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-800 transition">ยกเลิก</button>
+                <button onclick="confirmBuy()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded text-white transition">ยืนยันการซื้อ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentUser = null;
+        let currentRole = null;
+        let selectedNumber = null;
+
+        // Initialization
+        window.onload = () => {
+            const savedUser = localStorage.getItem('bt_user');
+            const savedRole = localStorage.getItem('bt_role');
+            if (savedUser && savedRole) {
+                currentUser = savedUser;
+                currentRole = savedRole;
+                showApp();
+            }
+        };
+
+        // UI Helpers
+        function showLoading() { document.getElementById('loading').classList.remove('hidden'); }
+        function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded shadow-lg flex items-center gap-2 transform transition-all duration-300 translate-y-full opacity-0`;
+            toast.innerHTML = `<i class="fas ${icon}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-full', 'opacity-0');
+            }, 10);
+
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add('translate-y-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Auth Functions
+        function switchTab(mode) {
+            document.getElementById('auth-mode').value = mode;
+            const tabLogin = document.getElementById('tab-login');
+            const tabRegister = document.getElementById('tab-register');
+            const btn = document.getElementById('auth-btn');
+
+            if (mode === 'login') {
+                tabLogin.className = "px-4 py-2 border-b-2 border-yellow-500 font-bold text-yellow-600";
+                tabRegister.className = "px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-yellow-600";
+                btn.innerText = "เข้าสู่ระบบ";
+            } else {
+                tabRegister.className = "px-4 py-2 border-b-2 border-yellow-500 font-bold text-yellow-600";
+                tabLogin.className = "px-4 py-2 border-b-2 border-transparent text-gray-500 hover:text-yellow-600";
+                btn.innerText = "สมัครสมาชิก";
+            }
+        }
+
+        async function handleAuth(e) {
+            e.preventDefault();
+            if(SCRIPT_URL.includes('AKfy')) {
+                showToast('กรุณาเปลี่ยน SCRIPT_URL ในโค้ดก่อนใช้งานจริง', 'error');
+            }
+
+            const mode = document.getElementById('auth-mode').value;
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            showLoading();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: mode, username: user, password: pass })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    if (mode === 'login') {
+                        currentUser = result.username;
+                        currentRole = result.role;
+                        localStorage.setItem('bt_user', currentUser);
+                        localStorage.setItem('bt_role', currentRole);
+                        showToast('เข้าสู่ระบบสำเร็จ!');
+                        showApp();
+                    } else {
+                        showToast(result.message);
+                        switchTab('login');
+                        document.getElementById('password').value = '';
+                    }
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์', 'error');
+                console.error(error);
+            }
+            hideLoading();
+        }
+
+        function logout() {
+            currentUser = null;
+            currentRole = null;
+            localStorage.removeItem('bt_user');
+            localStorage.removeItem('bt_role');
+            document.getElementById('app-section').classList.add('hidden');
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('nav-user-info').classList.add('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // Main App Functions
+        function showApp() {
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('app-section').classList.remove('hidden');
+            
+            document.getElementById('nav-user-info').classList.remove('hidden');
+            document.getElementById('display-username').innerText = currentUser;
+            document.getElementById('display-role').innerText = currentRole;
+            
+            if(currentRole === 'admin') {
+                document.getElementById('admin-controls').classList.remove('hidden');
+                document.getElementById('display-role').classList.replace('bg-yellow-700', 'bg-red-600');
+            } else {
+                document.getElementById('admin-controls').classList.add('hidden');
+                document.getElementById('display-role').classList.replace('bg-red-600', 'bg-yellow-700');
+            }
+
+            fetchNumbers();
+        }
+
+        async function fetchNumbers() {
+            showLoading();
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getNumbers' })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    renderGrid(result.data);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('ไม่สามารถโหลดข้อมูลเบอร์ได้', 'error');
+            }
+            hideLoading();
+        }
+
+        function renderGrid(numbersData) {
+            const grid = document.getElementById('numbers-grid');
+            grid.innerHTML = ''; // Clear old
+
+            numbersData.forEach(item => {
+                const numStr = item.number.toString().padStart(2, '0');
+                const isAvailable = item.status === 'available';
+                
+                const box = document.createElement('div');
+                
+                if(isAvailable) {
+                    box.className = "bg-green-50 border-2 border-green-400 text-green-700 hover:bg-green-500 hover:text-white cursor-pointer rounded-lg p-3 text-center transition shadow-sm font-bold text-2xl flex flex-col items-center justify-center aspect-square";
+                    box.onclick = () => openBuyModal(numStr);
+                    box.innerHTML = `<span>${numStr}</span>`;
+                } else {
+                    box.className = "bg-red-50 border-2 border-red-300 text-red-400 rounded-lg p-2 text-center shadow-sm font-bold flex flex-col items-center justify-center aspect-square opacity-70 relative overflow-hidden";
+                    // ถ้าเป็น admin ให้เห็นว่าใครซื้อ
+                    const ownerText = currentRole === 'admin' ? `<span class="text-xs text-red-600 mt-1 truncate w-full">${item.owner}</span>` : `<i class="fas fa-times text-sm mt-1"></i>`;
+                    box.innerHTML = `<span class="text-xl line-through">${numStr}</span>${ownerText}`;
+                }
+                
+                grid.appendChild(box);
+            });
+        }
+
+        // Buy Logic
+        function openBuyModal(number) {
+            selectedNumber = number;
+            document.getElementById('modal-number-display').innerText = number;
+            document.getElementById('buy-modal').classList.remove('hidden');
+        }
+
+        function closeBuyModal() {
+            selectedNumber = null;
+            document.getElementById('buy-modal').classList.add('hidden');
+        }
+
+        async function confirmBuy() {
+            if(!selectedNumber || !currentUser) return;
+            
+            closeBuyModal();
+            showLoading();
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ 
+                        action: 'buyNumber', 
+                        number: selectedNumber,
+                        username: currentUser 
+                    })
+                });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    showToast(result.message);
+                    fetchNumbers(); // รีโหลดกระดาน
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('ทำรายการไม่สำเร็จ กรุณาลองใหม่', 'error');
+            }
+            hideLoading();
+        }
+
+        // Admin Logic
+        async function resetBoard() {
+            // สร้าง Custom Confirmation แทน alert/confirm
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[60]";
+            modal.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4 border-t-4 border-red-500">
+                    <h3 class="text-xl font-bold mb-2 text-red-600"><i class="fas fa-exclamation-triangle"></i> คำเตือน!</h3>
+                    <p class="text-gray-600 mb-6">คุณแน่ใจหรือไม่ที่จะล้างกระดาน? ข้อมูลการซื้อในรอบนี้จะถูกรีเซ็ตเป็น "ว่าง" ทั้งหมด</p>
+                    <div class="flex justify-end gap-3">
+                        <button id="cancel-reset" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-800">ยกเลิก</button>
+                        <button id="confirm-reset" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white">ยืนยันล้างกระดาน</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            document.getElementById('cancel-reset').onclick = () => modal.remove();
+            document.getElementById('confirm-reset').onclick = async () => {
+                modal.remove();
+                showLoading();
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ action: 'resetNumbers', username: currentUser })
+                    });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        showToast(result.message);
+                        fetchNumbers();
+                    } else {
+                        showToast(result.message, 'error');
+                    }
+                } catch (error) {
+                    showToast('ทำรายการไม่สำเร็จ', 'error');
+                }
+                hideLoading();
+            };
+        }
+    </script>
+</body>
+</html>
