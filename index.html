@@ -1,68 +1,133 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <title>ระบบขายเบอร์ทอง</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ระบบขายเบอร์ทอง (GitHub Version)</title>
+  <style>
+    body { font-family: 'Sarabun', sans-serif; padding: 20px; background-color: #f4f4f9; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 20px; }
+    .number-box { padding: 15px; text-align: center; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-size: 18px; font-weight: bold; }
+    .available { background-color: #d4edda; color: #155724; }
+    .sold { background-color: #f8d7da; color: #721c24; cursor: not-allowed; opacity: 0.7; }
+    .hidden { display: none; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    button { background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
 </head>
 <body>
 
-    <h2>เข้าสู่ระบบ (Login)</h2>
-    <input type="text" id="username" placeholder="ชื่อผู้ใช้">
-    <input type="password" id="password" placeholder="รหัสผ่าน">
-    <button onclick="login()">เข้าสู่ระบบ</button>
-    <p id="login-status"></p>
+<div class="container" id="login-section">
+  <h2>เข้าสู่ระบบ (Login)</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="doLogin()" id="login-btn">เข้าสู่ระบบ</button>
+  <p id="login-msg" style="color:red;"></p>
+</div>
 
-    <hr>
+<div class="container hidden" id="app-section">
+  <h2>ยินดีต้อนรับ, <span id="display-user"></span> (<span id="display-role"></span>)</h2>
+  <button onclick="logout()" style="background-color: #dc3545; width: auto;">ออกจากระบบ</button>
+  
+  <div id="admin-panel" class="hidden" style="margin-top:20px; padding:10px; background:#e2e3e5;">
+    <h3>🛠️ เมนูผู้ดูแลระบบ (Admin)</h3>
+  </div>
 
-    <h2>สถานะเบอร์ทอง</h2>
-    <button onclick="loadNumbers()">โหลดแผงเบอร์ทอง</button>
-    <div id="number-board"></div>
+  <h3 style="margin-top:20px;">เลือกกระดานเบอร์ทอง</h3>
+  <div class="grid" id="number-board"></div>
+</div>
 
-    <script>
-        // เอา URL ที่ได้จากขั้นตอนการ Deploy Google Script มาใส่ที่นี่
-        const SCRIPT_URL = 'ใส่_WEB_APP_URL_ของคุณที่นี่'; 
+<script>
+  // ==========================================
+  // เอา URL จาก Google Apps Script (ตัวใหม่) มาวางที่นี่
+  // ==========================================
+  const scriptUrl = 'ใส่_URL_ลงท้ายด้วย_exec_ของคูณที่นี่'; 
+  
+  let currentUser = '';
 
-        async function login() {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            document.getElementById('login-status').innerText = 'กำลังตรวจสอบ...';
+  // ใช้ Fetch API แทน google.script.run
+  async function doLogin() {
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    const msg = document.getElementById('login-msg');
+    const btn = document.getElementById('login-btn');
+    
+    if(!user || !pass) return msg.innerText = "กรุณากรอกข้อมูลให้ครบถ้วน";
+    
+    msg.innerText = "กำลังตรวจสอบ...";
+    btn.disabled = true;
 
-            let response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', username: user, password: pass })
-            });
-            
-            let result = await response.json();
-            
-            if(result.status === 'success') {
-                document.getElementById('login-status').innerText = `ยินดีต้อนรับ! คุณอยู่ในสถานะ: ${result.role} (เครดิต: ${result.credit})`;
-            } else {
-                document.getElementById('login-status').innerText = result.message;
-            }
-        }
+    try {
+      // เรียกใช้ API โดยส่ง action=login 
+      const response = await fetch(`${scriptUrl}?action=login&user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`);
+      const res = await response.json();
+      
+      if(res.success) {
+        currentUser = res.username;
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('app-section').classList.remove('hidden');
+        document.getElementById('display-user').innerText = res.username;
+        document.getElementById('display-role').innerText = res.role;
+        
+        if(res.role === 'Admin') document.getElementById('admin-panel').classList.remove('hidden');
+        
+        loadNumbers();
+      } else {
+        msg.innerText = res.message;
+      }
+    } catch (error) {
+      msg.innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+    }
+    btn.disabled = false;
+  }
 
-        async function loadNumbers() {
-            let response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'getNumbers' })
-            });
-            
-            let result = await response.json();
-            let board = document.getElementById('number-board');
-            board.innerHTML = '';
-            
-            if(result.status === 'success') {
-                result.data.forEach(item => {
-                    // สร้าง block ง่ายๆ เพื่อแสดงผล
-                    let div = document.createElement('div');
-                    div.innerText = `เบอร์ ${item.number} - ${item.status}`;
-                    div.style.padding = '5px';
-                    div.style.margin = '2px';
-                    div.style.backgroundColor = item.status === 'available' ? 'lightgreen' : 'lightcoral';
-                    board.appendChild(div);
-                });
-            }
-        }
-    </script>
+  async function loadNumbers() {
+    const board = document.getElementById('number-board');
+    board.innerHTML = 'กำลังโหลดข้อมูล...';
+    
+    try {
+      const response = await fetch(`${scriptUrl}?action=getNumbers`);
+      const res = await response.json();
+      
+      if(res.success) {
+        board.innerHTML = '';
+        res.data.forEach(item => {
+          let div = document.createElement('div');
+          div.className = 'number-box ' + (item.status === 'Sold' ? 'sold' : 'available');
+          div.innerText = item.no;
+          
+          if(item.status === 'Sold') {
+            div.innerHTML += `<br><span style="font-size:12px">${item.owner}</span>`;
+          } else {
+            div.onclick = function() { confirmBuy(item.no); };
+          }
+          board.appendChild(div);
+        });
+      }
+    } catch (error) {
+      board.innerHTML = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+    }
+  }
+
+  async function confirmBuy(no) {
+    if(confirm('คุณต้องการจองเบอร์ ' + no + ' ใช่หรือไม่?')) {
+      try {
+        const response = await fetch(`${scriptUrl}?action=buy&no=${no}&user=${encodeURIComponent(currentUser)}`);
+        const res = await response.json();
+        alert(res.message);
+        loadNumbers(); // โหลดหน้ากระดานใหม่
+      } catch (error) {
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อระบบ");
+      }
+    }
+  }
+
+  function logout() {
+    location.reload();
+  }
+</script>
+
 </body>
 </html>
