@@ -10,8 +10,8 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
   <script>
-    // ⚠️ เอา URL Web App ที่ได้จาก Google Script มาวางในเครื่องหมายคำพูดด้านล่างนี้
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzTref3UUuGXru43ETSFCJIuQTBPS8MeVXYQUC7q8yPYrN3mqZsio4bEk3SLMJn0SUmEg/exec";
+    // ⚠️ เอา URL Web App ที่ได้จาก Google Script มาวางตรงนี้
+    const GAS_API_URL = "วาง_URL_GOOGLE_SCRIPT_ตรงนี้";
   </script>
 
   <style>
@@ -45,6 +45,12 @@
     /* แต่งกล่อง Admin */
     .admin-card { background: #1a2235; border: 1px solid #333; color: white; }
     .table-dark-custom { color: #fff; background: #1a2235; border-color: #444; }
+    
+    /* --- แก้ไขสไตล์เมนู Admin ให้ดูรู้ว่าอยู่หน้าไหน --- */
+    .admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
+    .admin-menu-item:hover { background-color: rgba(255, 215, 0, 0.1) !important; }
+    .admin-menu-item.active { background-color: rgba(255, 215, 0, 0.15) !important; border-left: 4px solid #ffd700; font-weight: bold; color: #ffd700 !important; }
+    .admin-menu-item.active i { color: #ffd700 !important; }
     
     #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; flex-direction: column; justify-content:center; align-items:center; color: #ffd700; }
   </style>
@@ -168,8 +174,8 @@
     </div>
     <div class="offcanvas-body p-0">
       <div class="list-group list-group-flush mt-2">
-        <div class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 text-warning me-2"></i> แดชบอร์ด</div>
-        <div class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill text-primary me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
+        <div id="menu-dashboard" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 text-white me-2"></i> แดชบอร์ด</div>
+        <div id="menu-users" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill text-white me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
       </div>
     </div>
   </div>
@@ -192,8 +198,8 @@
       <small>ถูกบนรับ 6,000 | ถูงล่างรับ 6,000 (เหมา 2 เด้งรับ 12,000)</small>
     </div>
 
-    <div id="user-alert-banner" class="alert alert-dark border-secondary shadow-sm d-flex justify-content-between align-items-center flex-wrap">
-      <div class="text-light"><i class="bi bi-person-circle text-warning"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name" class="text-warning"></b></div>
+    <div id="user-alert-banner" class="alert shadow-sm d-flex justify-content-between align-items-center flex-wrap" style="background-color: #1a2235; border: 1px solid #ffd700;">
+      <div class="text-light" style="font-size: 1.1rem;"><i class="bi bi-person-circle text-warning"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name" class="text-warning fs-5"></b></div>
       <div id="user-time-display" class="badge bg-danger fs-6 mt-2 mt-md-0 hidden"></div>
     </div>
     
@@ -218,12 +224,11 @@
   let currentUsername = ""; let currentFullName = ""; let selectedItems = []; 
   let hasShownWinAlert = false; let globalAllUsers = []; let isSystemClosed = false;
 
-  // --- API Caller (ฟังก์ชันหลักสำหรับเชื่อมต่อ GitHub ไปหา GAS) ---
   async function apiCall(action, payload = {}) {
     try {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ป้องกัน CORS Preflight
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: action, payload: payload })
       });
       return await response.json();
@@ -244,7 +249,6 @@
     return d.toLocaleString('th-TH', {year:'2-digit', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
   }
 
-  // --- Auth Functions ---
   async function login() {
     const user = document.getElementById('l-user').value.trim();
     const pass = document.getElementById('l-pass').value.trim();
@@ -284,8 +288,19 @@
   function switchAdminView(view) {
     document.getElementById('admin-view-dashboard').classList.add('hidden');
     document.getElementById('admin-view-users').classList.add('hidden');
-    if(view === 'dashboard') document.getElementById('admin-view-dashboard').classList.remove('hidden');
-    else if(view === 'users') document.getElementById('admin-view-users').classList.remove('hidden');
+    
+    // --- รีเซ็ตคลาส active ของเมนูทั้งหมด ---
+    document.getElementById('menu-dashboard').classList.remove('active');
+    document.getElementById('menu-users').classList.remove('active');
+
+    if(view === 'dashboard') {
+      document.getElementById('admin-view-dashboard').classList.remove('hidden');
+      document.getElementById('menu-dashboard').classList.add('active'); // ใส่ active ให้เมนูที่ถูกเลือก
+    }
+    else if(view === 'users') {
+      document.getElementById('admin-view-users').classList.remove('hidden');
+      document.getElementById('menu-users').classList.add('active'); // ใส่ active ให้เมนูที่ถูกเลือก
+    }
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('adminMenu'));
     if(offcanvas) offcanvas.hide();
   }
