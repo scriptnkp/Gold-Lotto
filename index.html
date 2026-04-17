@@ -19,6 +19,9 @@
     body { background-color: #0b0f19; font-family: 'Sarabun', sans-serif; padding-bottom: 90px; color: #f8f9fa; }
     .hidden { display: none !important; }
     
+    /* แก้ไขสี Placeholder ให้อ่านง่ายขึ้นในพื้นหลังสีดำ */
+    ::placeholder { color: #888888 !important; opacity: 1; }
+    
     /* กล่อง Card แจ็คพอต */
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
     @keyframes glow { from { box-shadow: 0 0 10px rgba(255,215,0,0.2); } to { box-shadow: 0 0 20px rgba(255,215,0,0.6); } }
@@ -64,23 +67,44 @@
 
 <div id="auth-page" class="container" style="max-width: 400px; margin: 10vh auto;">
   <div class="card admin-card shadow-lg border-0 p-4" style="border-radius: 15px; border-top: 4px solid #ffd700 !important;">
+    
     <div id="login-section">
       <h2 class="text-center mb-1" style="color: #ffd700; font-weight: 900;">GOLDEN LUCK</h2>
-      <p class="text-center text-muted mb-4 small">ระบบเบอร์ทอง ลุ้นแจ็คพอต 6,000</p>
-      <div class="mb-3"><input type="text" id="l-user" class="form-control bg-dark text-white border-secondary" placeholder="Username"></div>
-      <div class="mb-3"><input type="password" id="l-pass" class="form-control bg-dark text-white border-secondary" placeholder="Password"></div>
+      <p class="text-center text-muted mb-4 small">ระบบเบอร์ทอง</p>
+      
+      <div class="mb-3 text-start">
+        <label class="form-label text-light small mb-1">ชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="l-user" class="form-control bg-dark text-white border-secondary" placeholder="กรอก Username ของคุณ">
+      </div>
+      <div class="mb-4 text-start">
+        <label class="form-label text-light small mb-1">รหัสผ่าน (Password)</label>
+        <input type="password" id="l-pass" class="form-control bg-dark text-white border-secondary" placeholder="กรอกรหัสผ่าน">
+      </div>
+      
       <button class="btn w-100 fw-bold" style="background: #ffd700; color: #000;" onclick="login()">เข้าสู่ระบบ</button>
-      <div class="text-center mt-3 small text-muted">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(false)">สมัครที่นี่</a></div>
+      <div class="text-center mt-3 small text-muted">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
     </div>
     
     <div id="reg-section" class="hidden">
-      <h3 class="text-center mb-4 text-success"><b>สมัครสมาชิก</b></h3>
-      <div class="mb-3"><input type="text" id="r-name" class="form-control bg-dark text-white border-secondary" placeholder="ชื่อ-นามสกุล"></div>
-      <div class="mb-3"><input type="text" id="r-user" class="form-control bg-dark text-white border-secondary" placeholder="Username"></div>
-      <div class="mb-3"><input type="password" id="r-pass" class="form-control bg-dark text-white border-secondary" placeholder="Password"></div>
-      <button class="btn btn-success w-100 fw-bold" onclick="register()">ลงทะเบียน</button>
-      <div class="text-center mt-3 small text-muted"><a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(true)">กลับไปหน้า Login</a></div>
+      <h3 class="text-center mb-4 text-success"><b>สมัครสมาชิกใหม่</b></h3>
+      
+      <div class="mb-3 text-start">
+        <label class="form-label text-light small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
+        <input type="text" id="r-name" class="form-control bg-dark text-white border-secondary" placeholder="เช่น สมชาย ใจดี">
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label text-light small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="r-user" class="form-control bg-dark text-white border-secondary" placeholder="ภาษาอังกฤษหรือตัวเลข">
+      </div>
+      <div class="mb-4 text-start">
+        <label class="form-label text-light small mb-1">ตั้งรหัสผ่าน (Password)</label>
+        <input type="password" id="r-pass" class="form-control bg-dark text-white border-secondary" placeholder="อย่างน้อย 4 ตัวอักษร">
+      </div>
+      
+      <button class="btn btn-success w-100 fw-bold" onclick="register()">ยืนยันการลงทะเบียน</button>
+      <div class="text-center mt-3 small text-muted"><a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
     </div>
+    
   </div>
 </div>
 
@@ -175,7 +199,7 @@
     <div class="offcanvas-body p-0">
       <div class="list-group list-group-flush mt-2">
         <div id="menu-dashboard" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 text-white me-2"></i> แดชบอร์ด</div>
-        <div id="menu-users" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill text-white me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
+        <div id="menu-users" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill text-primary me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
       </div>
     </div>
   </div>
@@ -194,8 +218,8 @@
 
   <div class="container mt-4 mb-5">
     <div class="jackpot-banner mb-4">
-      <h2 class="mb-0 fw-bold"><i class="bi bi-cash-coin"></i> ร่วมสนุกลุ้นรางวัล!</h2>
-      <small>คนที่ได้รางวัล ติดต่อ Admin)</small>
+      <h2 class="mb-0 fw-bold"><i class="bi bi-cash-coin"></i> ร่วมสนุกลุ้นรางวัลพิเศษ!</h2>
+      <small>คนที่ได้รางวัลติดต่อ Admin</small>
     </div>
 
     <div id="user-alert-banner" class="alert shadow-sm d-flex justify-content-between align-items-center flex-wrap" style="background-color: #1a2235; border: 1px solid #ffd700;">
@@ -336,8 +360,7 @@
         let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
         let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
         actionBtns += `<button class="btn btn-sm btn-outline-light me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
-        // แก้ไข: สีของเวลาให้สว่างขึ้น (color: #cccccc)
-        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="fw-normal" style="font-size:0.7rem; color:#cccccc;">${u.time}</small></td><td class="text-white-50">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
+        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;">${u.time}</small></td><td class="text-secondary">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
       }).join('');
     }
 
@@ -355,9 +378,8 @@
       tbodyBooked.innerHTML = Object.values(groupedData).map(g => {
         let numHtml = '';
         if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small me-1">บน:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-info text-dark me-1">${n}</span>`).join('')}</div>`;
-        // แก้ไข: สีของเวลาให้สว่างขึ้น (color: #cccccc)
-        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="fw-normal" style="font-size:0.7rem; color:#cccccc;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
+        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
       }).join('');
     }
   }
@@ -489,7 +511,6 @@
     selectedItems.sort().forEach(i => { let p = i.split('_'); if (p[1] === 'Top') topNums.push(p[0]); else botNums.push(p[0]); });
 
     let dHtml = '';
-    // แก้ไข: ไม่ใช้คลาส text-dark ในเลขล่างแล้ว จะได้เห็นชัดเจนบนพื้นหลังดำ
     if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">บน</span> <b class="text-danger fs-5">${topNums.join(', ')}</b></div>`;
     if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info fs-5">${botNums.join(', ')}</b></div>`;
 
