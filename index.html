@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>THE GOLDEN LUCK</title>
+  <title>ระบบเบอร์ทอง</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,164 +15,164 @@
   </script>
 
   <style>
-    /* ธีม ดำ-ทอง Premium */
-    body { background-color: #0b0f19; font-family: 'Sarabun', sans-serif; padding-bottom: 90px; color: #f8f9fa; }
+    /* ธีมสว่าง (Light Theme) ออริจินัล */
+    body { background-color: #f4f7f6; font-family: 'Sarabun', sans-serif; padding-bottom: 90px; color: #212529; }
     .hidden { display: none !important; }
     
-    /* แก้ไขสี Placeholder ให้อ่านง่ายขึ้นในพื้นหลังสีดำ */
-    ::placeholder { color: #888888 !important; opacity: 1; }
-    
-    /* กล่อง Card แจ็คพอต */
-    .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
-    @keyframes glow { from { box-shadow: 0 0 10px rgba(255,215,0,0.2); } to { box-shadow: 0 0 20px rgba(255,215,0,0.6); } }
-    
     /* สไตล์กล่องเบอร์ */
-    .num-card { border: 1px solid #ffd700; border-radius: 12px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); overflow: hidden; text-align: center; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    .num-header { font-size: 1.8rem; font-weight: 900; padding: 10px 0; background: rgba(0, 0, 0, 0.4); color: #ffd700; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-    .num-btn { width: 50%; padding: 10px 0; font-size: 0.9rem; cursor: pointer; border-top: 1px solid #444; transition: 0.3s; background: transparent; color: #fff; }
-    .num-btn.top-btn { border-right: 1px solid #444; }
-    .num-btn:hover:not(.booked) { background: rgba(255, 215, 0, 0.2); }
+    .num-card { border: 1px solid #dee2e6; border-radius: 8px; background: white; overflow: hidden; text-align: center; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; }
+    .num-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .num-header { font-size: 1.5rem; font-weight: bold; padding: 10px 0; background: #f8f9fa; color: #343a40; border-bottom: 1px solid #dee2e6; }
+    .num-btn { width: 50%; padding: 8px 0; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: white; color: #212529; }
+    .num-btn.top-btn { border-right: 1px solid #dee2e6; }
+    .num-btn:hover:not(.booked) { background: #e9ecef; }
     
     /* สถานะกล่อง */
-    .num-btn.selected { background: linear-gradient(45deg, #198754, #20c997) !important; color: white !important; font-weight: bold; border-color: #20c997; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-    .num-btn.booked { background: #8b0000; color: #aaa; cursor: not-allowed; opacity: 0.6; }
+    .num-btn.selected { background: #198754 !important; color: white !important; font-weight: bold; }
+    .num-btn.booked { background: #dc3545; color: white !important; cursor: not-allowed; opacity: 0.9; }
     
-    .winner-badge { position: absolute; top: -5px; right: -5px; background: #ffc107; color: #000; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 10px; box-shadow: 0 2px 10px rgba(255,215,0,0.8); transform: rotate(15deg); z-index: 10; animation: pulse 1.5s infinite; }
-    
-    .booked-name { font-size: 0.65rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: #ccc; }
-    .num-btn.booked .booked-name { color: #fff !important; text-decoration: line-through; }
-    .num-btn.selected .booked-name { color: #fff !important; }
+    .winner-badge { position: absolute; top: -5px; right: -5px; background: #ffc107; color: #000; font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: rotate(15deg); z-index: 10; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { transform: scale(1) rotate(15deg); } 50% { transform: scale(1.1) rotate(15deg); } 100% { transform: scale(1) rotate(15deg); } }
 
-    .booking-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); border-top: 2px solid #ffd700; color: white; padding: 15px 20px; z-index: 1000; box-shadow: 0 -4px 20px rgba(255, 215, 0, 0.2); transition: 0.3s; }
-    
-    /* แต่งกล่อง Admin */
-    .admin-card { background: #1a2235; border: 1px solid #333; color: white; }
-    .table-dark-custom { color: #fff; background: #1a2235; border-color: #444; }
+    .booked-name { font-size: 0.65rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: #6c757d; }
+    .num-btn.booked .booked-name { color: #ffffff !important; }
+    .num-btn.selected .booked-name { color: #ffffff !important; }
+
+    /* แถบเมนูด้านล่าง */
+    .booking-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #212529; color: white; padding: 10px 20px; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: 0.3s; }
     
     /* สไตล์เมนู Admin */
-    .admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
-    .admin-menu-item:hover { background-color: rgba(255, 215, 0, 0.1) !important; }
-    .admin-menu-item.active { background-color: rgba(255, 215, 0, 0.15) !important; border-left: 4px solid #ffd700; font-weight: bold; color: #ffd700 !important; }
-    .admin-menu-item.active i { color: #ffd700 !important; }
+    .admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; color: #fff; }
+    .admin-menu-item:hover { background-color: rgba(255,255,255,0.1); }
+    .admin-menu-item.active { background-color: rgba(255,255,255,0.15); border-left: 4px solid #ffc107; font-weight: bold; color: #ffc107 !important; }
     
-    #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:flex; flex-direction: column; justify-content:center; align-items:center; color: #ffd700; }
+    .pay-radio { accent-color: #0d6efd; cursor: pointer; width: 18px; height: 18px; margin-right: 5px; vertical-align: middle; }
+    .pay-label { font-size: 1rem; cursor: pointer; vertical-align: middle; }
+    .swal-edit-form { text-align: left; }
+    .swal-edit-form label { font-size: 0.85rem; color: #6c757d; margin-bottom: 2px; margin-top: 10px; display: block; }
+    
+    #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.85); z-index:9999; display:flex; flex-direction: column; justify-content:center; align-items:center; color: #0d6efd; }
+    
+    .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; }
+    .card-stats:hover { transform: translateY(-5px); }
   </style>
 </head>
 <body>
 
 <div id="loader" class="hidden">
-  <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;"></div>
-  <div class="mt-3 fw-bold">กำลังซิงค์ข้อมูลกับเซิร์ฟเวอร์...</div>
+  <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+  <div class="mt-3 fw-bold text-primary">กำลังซิงค์ข้อมูลกับเซิร์ฟเวอร์...</div>
 </div>
 
 <div id="auth-page" class="container" style="max-width: 400px; margin: 10vh auto;">
-  <div class="card admin-card shadow-lg border-0 p-4" style="border-radius: 15px; border-top: 4px solid #ffd700 !important;">
+  <div class="card shadow-sm border-0 p-4" style="border-radius: 12px;">
     
     <div id="login-section">
-      <h2 class="text-center mb-1" style="color: #ffd700; font-weight: 900;">GOLDEN LUCK</h2>
-      <p class="text-center text-muted mb-4 small">ระบบเบอร์ทอง</p>
+      <h3 class="text-center mb-4 text-primary"><b>เข้าสู่ระบบ เบอร์ทอง</b></h3>
       
       <div class="mb-3 text-start">
-        <label class="form-label text-light small mb-1">ชื่อผู้ใช้งาน (Username)</label>
-        <input type="text" id="l-user" class="form-control bg-dark text-white border-secondary" placeholder="กรอก Username ของคุณ">
+        <label class="form-label text-muted small mb-1">ชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="l-user" class="form-control" placeholder="กรอก Username ของคุณ">
       </div>
       <div class="mb-4 text-start">
-        <label class="form-label text-light small mb-1">รหัสผ่าน (Password)</label>
-        <input type="password" id="l-pass" class="form-control bg-dark text-white border-secondary" placeholder="กรอกรหัสผ่าน">
+        <label class="form-label text-muted small mb-1">รหัสผ่าน (Password)</label>
+        <input type="password" id="l-pass" class="form-control" placeholder="กรอกรหัสผ่าน">
       </div>
       
-      <button class="btn w-100 fw-bold" style="background: #ffd700; color: #000;" onclick="login()">เข้าสู่ระบบ</button>
-      <div class="text-center mt-3 small text-muted">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
+      <button class="btn btn-primary w-100 fw-bold" onclick="login()">เข้าสู่ระบบ</button>
+      <div class="text-center mt-3 small text-muted">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-primary text-decoration-none fw-bold" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
     </div>
     
     <div id="reg-section" class="hidden">
       <h3 class="text-center mb-4 text-success"><b>สมัครสมาชิกใหม่</b></h3>
       
       <div class="mb-3 text-start">
-        <label class="form-label text-light small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
-        <input type="text" id="r-name" class="form-control bg-dark text-white border-secondary" placeholder="เช่น สมชาย ใจดี">
+        <label class="form-label text-muted small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
+        <input type="text" id="r-name" class="form-control" placeholder="เช่น สมชาย ใจดี">
       </div>
       <div class="mb-3 text-start">
-        <label class="form-label text-light small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
-        <input type="text" id="r-user" class="form-control bg-dark text-white border-secondary" placeholder="ภาษาอังกฤษหรือตัวเลข">
+        <label class="form-label text-muted small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
+        <input type="text" id="r-user" class="form-control" placeholder="ภาษาอังกฤษหรือตัวเลข">
       </div>
       <div class="mb-4 text-start">
-        <label class="form-label text-light small mb-1">ตั้งรหัสผ่าน (Password)</label>
-        <input type="password" id="r-pass" class="form-control bg-dark text-white border-secondary" placeholder="อย่างน้อย 4 ตัวอักษร">
+        <label class="form-label text-muted small mb-1">ตั้งรหัสผ่าน (Password)</label>
+        <input type="password" id="r-pass" class="form-control" placeholder="อย่างน้อย 4 ตัวอักษร">
       </div>
       
       <button class="btn btn-success w-100 fw-bold" onclick="register()">ยืนยันการลงทะเบียน</button>
-      <div class="text-center mt-3 small text-muted"><a href="javascript:void(0);" class="text-warning text-decoration-none" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
+      <div class="text-center mt-3 small text-muted"><a href="javascript:void(0);" class="text-success text-decoration-none fw-bold" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
     </div>
     
   </div>
 </div>
 
 <div id="admin-page" class="hidden">
-  <nav class="navbar navbar-dark shadow-sm" style="background: #050810; border-bottom: 2px solid #ffd700;">
+  <nav class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container-fluid">
-      <button class="navbar-toggler border-warning" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMenu"><span class="navbar-toggler-icon"></span></button>
-      <span class="navbar-brand mb-0 h1 text-warning fw-bold">Admin Panel</span>
-      <button class="btn btn-outline-warning btn-sm" onclick="logout()">ออกจากระบบ</button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMenu"><span class="navbar-toggler-icon"></span></button>
+      <span class="navbar-brand mb-0 h1 text-warning">Admin Dashboard</span>
+      <button class="btn btn-outline-light btn-sm" onclick="logout()">ออกจากระบบ</button>
     </div>
   </nav>
 
   <div class="container mt-4 mb-5">
     <div id="admin-view-dashboard">
-      <div class="card admin-card shadow-sm border-0 mb-4 border-top border-warning border-4">
+      <div class="card shadow-sm border-0 mb-4 border-top border-warning border-4">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
-            <h5 class="mb-0 text-warning"><i class="bi bi-gear-fill"></i> ตั้งค่าการจอง & ผลรางวัล</h5>
-            <button class="btn btn-danger btn-sm fw-bold" onclick="adminResetBoard()"><i class="bi bi-arrow-counterclockwise"></i> รีเซ็ตกระดาน</button>
+          <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <h5 class="mb-0 text-dark"><i class="bi bi-gear-fill text-secondary"></i> ตั้งค่าการจอง & ผลรางวัล</h5>
+            <button class="btn btn-danger btn-sm fw-bold" onclick="adminResetBoard()"><i class="bi bi-arrow-counterclockwise"></i> รีเซ็ตกระดานใหม่</button>
           </div>
           
           <div class="row g-2 mb-3">
             <div class="col-md-5">
               <label class="form-label small text-danger fw-bold"><i class="bi bi-clock-history"></i> เวลาปิดรับจอง</label>
-              <input type="datetime-local" id="input-time-close" class="form-control bg-dark text-white border-secondary">
+              <input type="datetime-local" id="input-time-close" class="form-control">
             </div>
             <div class="col-md-5">
               <label class="form-label small text-info fw-bold"><i class="bi bi-calendar-event"></i> เวลาประกาศผล</label>
-              <input type="datetime-local" id="input-time-draw" class="form-control bg-dark text-white border-secondary">
+              <input type="datetime-local" id="input-time-draw" class="form-control">
             </div>
             <div class="col-md-2 d-flex align-items-end">
-              <button class="btn btn-warning w-100 fw-bold" onclick="adminSaveTimes()">ตั้งเวลา</button>
+              <button class="btn btn-outline-secondary w-100 fw-bold" onclick="adminSaveTimes()">ตั้งเวลา</button>
             </div>
           </div>
 
-          <div class="row g-2 align-items-end p-2 rounded border border-secondary" style="background: rgba(0,0,0,0.2);">
+          <div class="row g-2 align-items-end p-2 rounded bg-light border">
             <div class="col-md-4">
-              <label class="form-label small" style="color: #cccccc;">เลขที่ออก (บน)</label>
-              <input type="number" id="input-win-top" class="form-control bg-dark text-success border-success text-center fw-bold fs-5" placeholder="--">
+              <label class="form-label small text-muted">เลขที่ออก (บน)</label>
+              <input type="number" id="input-win-top" class="form-control border-success text-center fw-bold text-success fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
-              <label class="form-label small" style="color: #cccccc;">เลขที่ออก (ล่าง)</label>
-              <input type="number" id="input-win-bot" class="form-control bg-dark text-danger border-danger text-center fw-bold fs-5" placeholder="--">
+              <label class="form-label small text-muted">เลขที่ออก (ล่าง)</label>
+              <input type="number" id="input-win-bot" class="form-control border-danger text-center fw-bold text-danger fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
-              <button class="btn btn-success w-100 fw-bold" onclick="adminSaveWinners()"><i class="bi bi-trophy"></i> บันทึกผลรางวัล</button>
+              <button class="btn btn-primary w-100 fw-bold" onclick="adminSaveWinners()"><i class="bi bi-trophy"></i> บันทึกผลรางวัล</button>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="admin-winners-section" class="card admin-card shadow-sm border-0 mb-4 hidden">
+      <div id="admin-winners-section" class="card shadow-sm border-0 mb-4 border-start border-success border-4 hidden">
         <div class="card-body">
-          <h5 class="mb-3 text-warning fw-bold"><i class="bi bi-award-fill"></i> สรุปรายชื่อผู้ถูกรางวัลประจำงวด</h5>
+          <h5 class="mb-3 text-success fw-bold"><i class="bi bi-award-fill"></i> สรุปรายชื่อผู้ถูกรางวัลประจำงวด</h5>
           <div id="admin-winners-list"></div>
         </div>
       </div>
 
+      <h4 class="mb-3 text-secondary"><i class="bi bi-speedometer2"></i> ภาพรวมระบบ (บน-ล่าง)</h4>
       <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4"><div class="card p-3 admin-card border-primary"><small class="text-muted">รายการคงเหลือ</small><h3 id="stat-rem" class="mb-0 text-primary">-</h3></div></div>
-        <div class="col-6 col-md-4"><div class="card p-3 admin-card border-danger"><small class="text-muted">โดนจองแล้ว</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
-        <div class="col-12 col-md-4"><div class="card p-3 admin-card border-warning"><small class="text-muted">รายได้รวม (บาท)</small><h3 id="stat-rev" class="mb-0 text-warning">-</h3></div></div>
+        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-primary"><small class="text-muted">รายการคงเหลือ</small><h3 id="stat-rem" class="mb-0 text-primary">-</h3></div></div>
+        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="text-muted">โดนจองแล้ว</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
+        <div class="col-12 col-md-4"><div class="card p-3 shadow-sm card-stats border-success"><small class="text-muted">รายได้รวม (บาท)</small><h3 id="stat-rev" class="mb-0 text-success">-</h3></div></div>
       </div>
 
-      <div class="card admin-card shadow-sm border-0">
+      <h5 class="mb-3 text-primary"><i class="bi bi-list-check"></i> สรุปรายการจอง (แยกตามบุคคล)</h5>
+      <div class="card shadow-sm border-0">
         <div class="card-body p-0 table-responsive">
-          <table class="table table-dark table-hover align-middle mb-0 table-dark-custom">
-            <thead><tr><th class="ps-4">ชื่อผู้จอง</th><th>รายการเบอร์ที่จอง</th><th>ชำระเงิน</th><th class="text-end pe-4">ยอดรวม</th></tr></thead>
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr><th class="ps-4">ชื่อผู้จอง</th><th>รายการเบอร์ที่จอง</th><th>ชำระเงิน</th><th class="text-end pe-4">ยอดรวม (บาท)</th></tr></thead>
             <tbody id="booked-table-body"></tbody>
           </table>
         </div>
@@ -180,11 +180,11 @@
     </div>
 
     <div id="admin-view-users" class="hidden">
-      <h4 class="mb-3 text-warning"><i class="bi bi-people-fill"></i> จัดการ User ทั้งหมด</h4>
-      <div class="card admin-card shadow-sm border-0">
+      <h4 class="mb-3 text-primary"><i class="bi bi-people-fill"></i> จัดการ User ทั้งหมด</h4>
+      <div class="card shadow-sm border-0">
         <div class="card-body p-0 table-responsive">
-          <table class="table table-dark table-hover align-middle mb-0 table-dark-custom">
-            <thead><tr><th class="ps-4">ชื่อ - นามสกุล</th><th>Username</th><th>สถานะ</th><th class="text-end pe-4">จัดการ</th></tr></thead>
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr><th class="ps-4">ชื่อ - นามสกุล</th><th>Username</th><th>สถานะ</th><th class="text-end pe-4">จัดการ</th></tr></thead>
             <tbody id="all-users-table-body"></tbody>
           </table>
         </div>
@@ -198,32 +198,28 @@
     </div>
     <div class="offcanvas-body p-0">
       <div class="list-group list-group-flush mt-2">
-        <div id="menu-dashboard" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 text-white me-2"></i> แดชบอร์ด</div>
-        <div id="menu-users" class="list-group-item bg-dark text-white admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill text-primary me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
+        <div id="menu-dashboard" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 me-2"></i> แดชบอร์ด</div>
+        <div id="menu-users" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
       </div>
     </div>
   </div>
 </div>
 
 <div id="user-page" class="hidden">
-  <nav class="navbar navbar-dark shadow-sm" style="background: #050810; border-bottom: 2px solid #ffd700;">
+  <nav class="navbar navbar-dark bg-primary shadow-sm">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h4 fw-bold" style="color: #ffd700;"><i class="bi bi-gem"></i> THE GOLDEN LUCK</span>
+      <span class="navbar-brand mb-0 h1"><i class="bi bi-star-fill text-warning"></i> กระดานเบอร์ทอง</span>
       <div>
         <span id="user-display-name" class="text-white me-3 d-none d-md-inline"></span>
-        <button class="btn btn-outline-warning btn-sm fw-bold" onclick="logout()">ออก</button>
+        <button class="btn btn-outline-light btn-sm fw-bold" onclick="logout()">ออกจากระบบ</button>
       </div>
     </div>
   </nav>
 
   <div class="container mt-4 mb-5">
-    <div class="jackpot-banner mb-4">
-      <h2 class="mb-0 fw-bold"><i class="bi bi-cash-coin"></i> ร่วมสนุกลุ้นรางวัลพิเศษ!</h2>
-      <small>คนที่ได้รางวัลติดต่อ Admin</small>
-    </div>
-
-    <div id="user-alert-banner" class="alert shadow-sm d-flex justify-content-between align-items-center flex-wrap" style="background-color: #1a2235; border: 1px solid #ffd700;">
-      <div class="text-light" style="font-size: 1.1rem;"><i class="bi bi-person-circle text-warning"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name" class="text-warning fs-5"></b></div>
+    
+    <div id="user-alert-banner" class="alert alert-info shadow-sm d-flex justify-content-between align-items-center flex-wrap">
+      <div><i class="bi bi-info-circle-fill"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name"></b>! กดเลือก <b>บน</b> หรือ <b>ล่าง</b> ได้ตามใจชอบเลยครับ</div>
       <div id="user-time-display" class="badge bg-danger fs-6 mt-2 mt-md-0 hidden"></div>
     </div>
     
@@ -232,13 +228,13 @@
 
   <div id="booking-bar" class="booking-bar hidden d-flex justify-content-between align-items-center">
     <div>
-      <span class="fw-bold fs-5 text-warning">เลือกแล้ว <span id="selected-count" class="text-white">0</span> เบอร์</span>
+      <span class="fw-bold fs-5">เลือกแล้ว <span id="selected-count" class="text-warning">0</span> รายการ</span>
       <div class="mt-1">
         <label class="me-3 pay-label text-white"><input type="radio" name="payType" value="เงินสด" class="pay-radio" checked> 💵 เงินสด</label>
         <label class="pay-label text-white"><input type="radio" name="payType" value="เงินเซ็น" class="pay-radio"> 📝 เงินเซ็น</label>
       </div>
     </div>
-    <button class="btn fw-bold px-3 py-2 shadow-lg" style="background: #ffd700; color: #000; border-radius: 8px;" onclick="confirmBooking()">ยืนยันคว้าโชค <i class="bi bi-star-fill"></i></button>
+    <button class="btn btn-success fw-bold px-3 py-2 shadow" onclick="confirmBooking()">ยืนยันจอง <i class="bi bi-check-circle"></i></button>
   </div>
 </div>
 
@@ -344,7 +340,7 @@
     const winnersList = document.getElementById('admin-winners-list');
     if (res.winnersList && res.winnersList.length > 0) {
       winnersSection.classList.remove('hidden');
-      winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-warning py-2 mb-2 border-warning d-flex justify-content-between align-items-center bg-dark text-white"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-warning fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
+      winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-success py-2 mb-2 d-flex justify-content-between align-items-center"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-success fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
     } else if (res.winners.top || res.winners.bot) {
        winnersSection.classList.remove('hidden'); winnersList.innerHTML = `<div class="text-muted small">เจ้ามือกินเรียบงวดนี้ 😎</div>`;
     } else winnersSection.classList.add('hidden');
@@ -353,19 +349,19 @@
     const tbodyUsers = document.getElementById('all-users-table-body');
     const badge = document.getElementById('pending-badge');
     if(res.pendingUsers.length === 0) badge.classList.add('hidden'); else { badge.innerText = res.pendingUsers.length; badge.classList.remove('hidden'); }
-    if(res.allUsers.length === 0) tbodyUsers.innerHTML = `<tr><td colspan="4" class="text-center text-muted">ไม่มีข้อมูล</td></tr>`;
+    if(res.allUsers.length === 0) tbodyUsers.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">ไม่มีข้อมูล</td></tr>`;
     else {
       tbodyUsers.innerHTML = res.allUsers.map(u => {
         let statusBadge = u.status.toLowerCase() === 'approved' ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-secondary">Pending</span>';
-        let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
+        let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-primary">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
         let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
-        actionBtns += `<button class="btn btn-sm btn-outline-light me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
-        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;">${u.time}</small></td><td class="text-secondary">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
+        actionBtns += `<button class="btn btn-sm btn-warning me-1 mb-1 text-dark" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-danger mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
+        return `<tr><td class="ps-4 fw-bold text-dark">${u.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;">${u.time}</small></td><td class="text-secondary">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
       }).join('');
     }
 
     const tbodyBooked = document.getElementById('booked-table-body');
-    if(res.bookedList.length === 0) tbodyBooked.innerHTML = `<tr><td colspan="4" class="text-center text-muted">ยังไม่มีการจอง</td></tr>`;
+    if(res.bookedList.length === 0) tbodyBooked.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">ยังไม่มีการจอง</td></tr>`;
     else {
       const groupedData = {};
       res.bookedList.forEach(b => {
@@ -377,9 +373,9 @@
       });
       tbodyBooked.innerHTML = Object.values(groupedData).map(g => {
         let numHtml = '';
-        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small me-1">บน:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
+        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-primary small fw-bold me-1">บน:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        if(g.botNums.length > 0) numHtml += `<div><span class="text-dark small fw-bold me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        return `<tr><td class="ps-4 fw-bold text-dark">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-success fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
       }).join('');
     }
   }
@@ -451,11 +447,11 @@
       
       let topBadge = ''; let botBadge = '';
       if(data.winners.top && item.number === data.winners.top) {
-        topBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
+        topBadge = '<div class="winner-badge">🏆 เลขออก!</div>';
         if(isTopBooked && item.top.user === currentFullName) { myWinnings.push(`บน ${item.number}`); totalPrize += 6000; }
       }
       if(data.winners.bot && item.number === data.winners.bot) {
-        botBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
+        botBadge = '<div class="winner-badge">🏆 เลขออก!</div>';
         if(isBotBooked && item.bottom.user === currentFullName) { myWinnings.push(`ล่าง ${item.number}`); totalPrize += 6000; }
       }
       
@@ -478,11 +474,11 @@
 
     if(isFirstLogin && myWinnings.length > 0 && !hasShownWinAlert) {
       hasShownWinAlert = true;
-      confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ['#ffd700', '#ffffff', '#ff8c00'] });
+      confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }});
       Swal.fire({
         title: '🎉 แจ็คพอตแตก! 🎉',
         html: `คุณ ${currentFullName} ถูกรางวัลหมายเลข <b class="text-danger fs-4">${myWinnings.join(', ')}</b><br><h2 class="text-success fw-bold mt-3 mb-1">+${totalPrize.toLocaleString()} ฿</h2><br><small class="text-muted">รีบแคปหน้าจอนี้ส่งให้แอดมินเพื่อรับเงินรางวัล!</small>`,
-        icon: 'success', confirmButtonText: 'สุดยอด!', confirmButtonColor: '#ffd700', color: '#000', background: '#fff'
+        icon: 'success', confirmButtonText: 'สุดยอด!'
       });
     } else if (isFirstLogin) Swal.fire({ title: 'เข้าสู่ระบบสำเร็จ', text: 'ยินดีต้อนรับคุณ ' + currentFullName, icon: 'success', timer: 1000, showConfirmButton: false });
   }
@@ -512,12 +508,12 @@
 
     let dHtml = '';
     if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">บน</span> <b class="text-danger fs-5">${topNums.join(', ')}</b></div>`;
-    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info fs-5">${botNums.join(', ')}</b></div>`;
+    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info text-dark fs-5">${botNums.join(', ')}</b></div>`;
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
-      html: `<div class="text-start bg-dark text-white p-3 rounded mb-3 border border-secondary">${dHtml}</div>ชำระแบบ: <b class="text-warning">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
-      icon: 'info', showCancelButton: true, confirmButtonText: 'ยืนยันจอง!', confirmButtonColor: '#ffd700', cancelButtonText: 'ยกเลิก', color: '#000'
+      html: `<div class="text-start bg-light p-3 rounded mb-3 border border-secondary">${dHtml}</div>ชำระแบบ: <b class="text-primary">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
+      icon: 'info', showCancelButton: true, confirmButtonText: 'ยืนยันจอง!', confirmButtonColor: '#198754', cancelButtonText: 'ยกเลิก'
     }).then(async (r) => {
       if (r.isConfirmed) {
         loader.classList.remove('hidden');
