@@ -10,7 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   
   <script>
-    // ⚠️ เอา URL Web App ที่ได้จาก Google Script มาวางตรงนี้
+    // ⚠️ URL Web App ประจำโปรเจกต์
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzTref3UUuGXru43ETSFCJIuQTBPS8MeVXYQUC7q8yPYrN3mqZsio4bEk3SLMJn0SUmEg/exec";
   </script>
 
@@ -46,7 +46,7 @@
     .admin-card { background: #1a2235; border: 1px solid #333; color: white; }
     .table-dark-custom { color: #fff; background: #1a2235; border-color: #444; }
     
-    /* --- แก้ไขสไตล์เมนู Admin ให้ดูรู้ว่าอยู่หน้าไหน --- */
+    /* สไตล์เมนู Admin */
     .admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; }
     .admin-menu-item:hover { background-color: rgba(255, 215, 0, 0.1) !important; }
     .admin-menu-item.active { background-color: rgba(255, 215, 0, 0.15) !important; border-left: 4px solid #ffd700; font-weight: bold; color: #ffd700 !important; }
@@ -118,11 +118,11 @@
 
           <div class="row g-2 align-items-end p-2 rounded border border-secondary" style="background: rgba(0,0,0,0.2);">
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (บน)</label>
+              <label class="form-label small" style="color: #cccccc;">เลขที่ออก (บน)</label>
               <input type="number" id="input-win-top" class="form-control bg-dark text-success border-success text-center fw-bold fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (ล่าง)</label>
+              <label class="form-label small" style="color: #cccccc;">เลขที่ออก (ล่าง)</label>
               <input type="number" id="input-win-bot" class="form-control bg-dark text-danger border-danger text-center fw-bold fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
@@ -289,17 +289,16 @@
     document.getElementById('admin-view-dashboard').classList.add('hidden');
     document.getElementById('admin-view-users').classList.add('hidden');
     
-    // --- รีเซ็ตคลาส active ของเมนูทั้งหมด ---
     document.getElementById('menu-dashboard').classList.remove('active');
     document.getElementById('menu-users').classList.remove('active');
 
     if(view === 'dashboard') {
       document.getElementById('admin-view-dashboard').classList.remove('hidden');
-      document.getElementById('menu-dashboard').classList.add('active'); // ใส่ active ให้เมนูที่ถูกเลือก
+      document.getElementById('menu-dashboard').classList.add('active'); 
     }
     else if(view === 'users') {
       document.getElementById('admin-view-users').classList.remove('hidden');
-      document.getElementById('menu-users').classList.add('active'); // ใส่ active ให้เมนูที่ถูกเลือก
+      document.getElementById('menu-users').classList.add('active'); 
     }
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('adminMenu'));
     if(offcanvas) offcanvas.hide();
@@ -337,7 +336,8 @@
         let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
         let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
         actionBtns += `<button class="btn btn-sm btn-outline-light me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-outline-danger mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
-        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;">${u.time}</small></td><td class="text-secondary">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
+        // แก้ไข: สีของเวลาให้สว่างขึ้น (color: #cccccc)
+        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="fw-normal" style="font-size:0.7rem; color:#cccccc;">${u.time}</small></td><td class="text-white-50">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
       }).join('');
     }
 
@@ -355,8 +355,9 @@
       tbodyBooked.innerHTML = Object.values(groupedData).map(g => {
         let numHtml = '';
         if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small me-1">บน:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
+        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small me-1">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-info text-dark me-1">${n}</span>`).join('')}</div>`;
+        // แก้ไข: สีของเวลาให้สว่างขึ้น (color: #cccccc)
+        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="fw-normal" style="font-size:0.7rem; color:#cccccc;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
       }).join('');
     }
   }
@@ -488,8 +489,9 @@
     selectedItems.sort().forEach(i => { let p = i.split('_'); if (p[1] === 'Top') topNums.push(p[0]); else botNums.push(p[0]); });
 
     let dHtml = '';
-    if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">บน</span> <b class="text-danger">${topNums.join(', ')}</b></div>`;
-    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info text-dark">${botNums.join(', ')}</b></div>`;
+    // แก้ไข: ไม่ใช้คลาส text-dark ในเลขล่างแล้ว จะได้เห็นชัดเจนบนพื้นหลังดำ
+    if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">บน</span> <b class="text-danger fs-5">${topNums.join(', ')}</b></div>`;
+    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info fs-5">${botNums.join(', ')}</b></div>`;
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
