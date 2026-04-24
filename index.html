@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>THE GOLDEN LUCK</title>
+  <title>THE GOLDEN LUCK | แจ็คพอต 6,000 บาท</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -27,14 +27,16 @@
       --header-text: #343a40;
       --btn-hover-bg: #e9ecef;
       --text-muted: #6c757d; 
+      --text-label: #6c757d;
       --nav-bg: #212529; 
-      --nav-user-bg: #0d6efd; /* Navbar สีน้ำเงินในโหมดสว่าง */
+      --nav-user-bg: #0d6efd; 
       --bar-bg: #ffffff;
       --bar-text: #212529;
       --input-bg: #ffffff;
       --input-text: #212529;
-      --alert-bg: #cff4fc; /* พื้นหลัง alert อ่อนๆ */
+      --alert-bg: #cff4fc; 
       --alert-border: #b6effb;
+      --table-text: #212529;
     }
 
     /* =========================================
@@ -49,17 +51,17 @@
       --header-text: #ffd700;
       --btn-hover-bg: rgba(255, 215, 0, 0.2);
       --text-muted: #cbd5e1; 
+      --text-label: #e2e8f0; /* สีสว่างสำหรับ Label / เวลา */
       --nav-bg: #050810;
-      --nav-user-bg: #050810; /* Navbar สีดำในโหมดมืด */
+      --nav-user-bg: #050810; 
       --bar-bg: rgba(10, 15, 25, 0.95);
       --bar-text: #ffffff;
       --input-bg: #1a2235;
       --input-text: #ffffff;
-      --alert-bg: #1a2235; /* พื้นหลัง alert มืด */
+      --alert-bg: #1a2235; 
       --alert-border: #ffd700;
+      --table-text: #f8f9fa;
     }
-
-    .text-muted { color: var(--text-muted) !important; }
 
     body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Sarabun', sans-serif; padding-bottom: 90px; transition: background-color 0.3s, color 0.3s; }
     .hidden { display: none !important; }
@@ -67,8 +69,8 @@
     /* สไตล์กล่องเบอร์ */
     .num-card { border: 1px solid var(--card-border); border-radius: 8px; background: var(--card-bg); overflow: hidden; text-align: center; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; backdrop-filter: blur(5px); }
     .num-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-    .num-header { font-size: 1.5rem; font-weight: bold; padding: 10px 0; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid var(--card-border); transition: background-color 0.3s, color 0.3s; }
-    .num-btn { width: 50%; padding: 8px 0; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-color); border-top: 1px solid var(--card-border); }
+    .num-header { font-size: 1.8rem; font-weight: 900; padding: 10px 0; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid var(--card-border); transition: background-color 0.3s, color 0.3s; }
+    .num-btn { width: 50%; padding: 8px 0; font-size: 0.9rem; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-color); border-top: 1px solid var(--card-border); }
     .num-btn.top-btn { border-right: 1px solid var(--card-border); }
     .num-btn:hover:not(.booked) { background: var(--btn-hover-bg); }
     
@@ -82,15 +84,12 @@
     @keyframes pulse { 0% { transform: scale(1) rotate(15deg); } 50% { transform: scale(1.1) rotate(15deg); } 100% { transform: scale(1) rotate(15deg); } }
 
     .booked-name { font-size: 0.65rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: var(--text-muted); }
-    .num-btn.booked .booked-name { color: #ffffff !important; }
+    .num-btn.booked .booked-name { color: #ffffff !important; text-decoration: line-through; }
     .num-btn.selected .booked-name { color: #ffffff !important; }
-    [data-theme="dark"] .num-btn.booked .booked-name { text-decoration: line-through; }
 
-    /* แถบเมนูด้านDown */
     .booking-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bar-bg); color: var(--bar-text); padding: 10px 20px; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: 0.3s; }
     [data-theme="dark"] .booking-bar { border-top: 2px solid #ffd700; background: rgba(10, 15, 25, 0.95); color: #ffffff; }
     
-    /* สไตล์เมนู Admin */
     .admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; color: #fff; }
     .admin-menu-item:hover { background-color: rgba(255,255,255,0.1); }
     .admin-menu-item.active { background-color: rgba(255,255,255,0.15); border-left: 4px solid #ffc107; font-weight: bold; color: #ffc107 !important; }
@@ -100,29 +99,29 @@
     .pay-label { font-size: 1rem; cursor: pointer; vertical-align: middle; }
     
     .swal-edit-form { text-align: left; }
-    .swal-edit-form label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2px; margin-top: 10px; display: block; }
+    .swal-edit-form label { font-size: 0.85rem; color: var(--text-label); margin-bottom: 2px; margin-top: 10px; display: block; }
     
     #loader { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); opacity: 0.95; z-index:9999; display:flex; flex-direction: column; justify-content:center; align-items:center; transition: background-color 0.3s; }
     
     .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .card-stats:hover { transform: translateY(-5px); }
     
-    /* แจ็คพอตแUpเนอร์ (ตอนนี้โชว์ทั้งโหมดสว่างและมืด) */
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
 
-    /* กล่อง Card ทั่วไป */
     .card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
-    .table { color: var(--text-color); }
+    .table { color: var(--table-text); }
     .table-hover tbody tr:hover { color: var(--text-color); }
     
-    /* Input Fields */
-    .form-control, .form-select { background-color: var(--input-bg); color: var(--input-text); border-color: var(--card-border); }
+    .form-control, .form-select { background-color: var(--input-bg); color: var(--input-text); border-color: var(--card-border); color-scheme: light dark; }
     .form-control:focus, .form-select:focus { background-color: var(--input-bg); color: var(--input-text); }
     [data-theme="dark"] ::placeholder { color: #888888 !important; opacity: 1; }
 
-    /* Theme Toggle Button */
     .theme-toggle-btn { cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
     .theme-toggle-btn:hover { background: var(--btn-hover-bg); }
+
+    /* แก้ไขสีเฉพาะจุดที่เคยอ่านไม่ออก */
+    .lbl-bright { color: var(--text-label); }
+    .time-bright { color: var(--text-label); }
   </style>
 </head>
 <body>
@@ -139,44 +138,41 @@
     </button>
   </div>
 
-  <div class="card shadow-sm p-4" style="border-radius: 12px;">
-    
+  <div class="card shadow-sm p-4" style="border-radius: 12px; border-top: 4px solid #ffd700 !important;">
     <div id="login-section">
       <h3 class="text-center mb-4 text-primary" id="login-title"><b>เข้าสู่ระบบ ลุ้นโชค</b></h3>
       
       <div class="mb-3 text-start">
-        <label class="form-label text-muted small mb-1">ชื่อผู้ใช้งาน (Username)</label>
+        <label class="form-label lbl-bright small mb-1">ชื่อผู้ใช้งาน (Username)</label>
         <input type="text" id="l-user" class="form-control" placeholder="กรอก Username ของคุณ">
       </div>
       <div class="mb-4 text-start">
-        <label class="form-label text-muted small mb-1">รหัสผ่าน (Password)</label>
+        <label class="form-label lbl-bright small mb-1">รหัสผ่าน (Password)</label>
         <input type="password" id="l-pass" class="form-control" placeholder="กรอกรหัสผ่าน">
       </div>
       
       <button class="btn btn-primary w-100 fw-bold" id="btn-login" onclick="login()">เข้าสู่ระบบ</button>
-      <div class="text-center mt-3 small">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-primary text-decoration-none fw-bold" id="link-register" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
+      <div class="text-center mt-3 small lbl-bright">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-primary text-decoration-none fw-bold" id="link-register" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
     </div>
     
     <div id="reg-section" class="hidden">
       <h3 class="text-center mb-4 text-success" id="reg-title"><b>สมัครสมาชิกใหม่</b></h3>
-      
       <div class="mb-3 text-start">
-        <label class="form-label text-muted small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
+        <label class="form-label lbl-bright small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
         <input type="text" id="r-name" class="form-control" placeholder="เช่น สมชาย ใจดี">
       </div>
       <div class="mb-3 text-start">
-        <label class="form-label text-muted small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
+        <label class="form-label lbl-bright small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
         <input type="text" id="r-user" class="form-control" placeholder="ภาษาอังกฤษหรือตัวเลข">
       </div>
       <div class="mb-4 text-start">
-        <label class="form-label text-muted small mb-1">ตั้งรหัสผ่าน (Password)</label>
+        <label class="form-label lbl-bright small mb-1">ตั้งรหัสผ่าน (Password)</label>
         <input type="password" id="r-pass" class="form-control" placeholder="อย่างน้อย 4 ตัวอักษร">
       </div>
       
       <button class="btn btn-success w-100 fw-bold" onclick="register()">ยืนยันการลงทะเบียน</button>
-      <div class="text-center mt-3 small"><a href="javascript:void(0);" class="text-success text-decoration-none fw-bold" id="link-back-login" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
+      <div class="text-center mt-3 small lbl-bright"><a href="javascript:void(0);" class="text-success text-decoration-none fw-bold" id="link-back-login" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
     </div>
-    
   </div>
 </div>
 
@@ -217,11 +213,11 @@
 
           <div class="row g-2 align-items-end p-2 rounded border" style="background-color: rgba(0,0,0,0.05); border-color: var(--card-border) !important;">
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (Up)</label>
+              <label class="form-label small lbl-bright">เลขที่ออก (Up)</label>
               <input type="number" id="input-win-top" class="form-control border-success text-center fw-bold text-success fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (Down)</label>
+              <label class="form-label small lbl-bright">เลขที่ออก (Down)</label>
               <input type="number" id="input-win-bot" class="form-control border-danger text-center fw-bold text-danger fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
@@ -240,16 +236,16 @@
 
       <h4 class="mb-3" style="color: var(--text-color);"><i class="bi bi-speedometer2"></i> ภาพรวมระบบ (Up-Down)</h4>
       <div class="row g-3 mb-4">
-        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-primary"><small class="text-muted">รายการคงเหลือ</small><h3 id="stat-rem" class="mb-0 text-primary">-</h3></div></div>
-        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="text-muted">โดนจองแล้ว</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
-        <div class="col-12 col-md-4"><div class="card p-3 shadow-sm card-stats border-warning"><small class="text-muted">รายได้รวม (บาท)</small><h3 id="stat-rev" class="mb-0 text-warning">-</h3></div></div>
+        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-primary"><small class="lbl-bright">รายการคงเหลือ</small><h3 id="stat-rem" class="mb-0 text-primary">-</h3></div></div>
+        <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="lbl-bright">โดนจองแล้ว</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
+        <div class="col-12 col-md-4"><div class="card p-3 shadow-sm card-stats border-warning"><small class="lbl-bright">รายได้รวม (บาท)</small><h3 id="stat-rev" class="mb-0 text-warning">-</h3></div></div>
       </div>
 
       <h5 class="mb-3 text-primary"><i class="bi bi-list-check"></i> สรุปรายการจอง (แยกตามบุคคล)</h5>
       <div class="card shadow-sm border-0">
         <div class="card-body p-0 table-responsive">
           <table class="table table-hover align-middle mb-0" id="admin-table-1">
-            <thead id="admin-thead-1"><tr><th class="ps-4">ชื่อผู้จอง</th><th>รายการเบอร์ที่จอง</th><th>ชำระเงิน</th><th class="text-end pe-4">ยอดรวม (บาท)</th></tr></thead>
+            <thead id="admin-thead-1"><tr><th class="ps-4">ชื่อผู้จอง</th><th>รายการเบอร์ที่จอง</th><th>ชำระ</th><th class="text-end pe-4">ยอดรวม (บาท)</th></tr></thead>
             <tbody id="booked-table-body"></tbody>
           </table>
         </div>
@@ -313,8 +309,8 @@
     <div>
       <span class="fw-bold fs-5" id="bar-text-main">เลือกแล้ว <span id="selected-count" class="text-warning">0</span> รายการ</span>
       <div class="mt-1">
-        <label class="me-3 pay-label"><input type="radio" name="payType" value="เงินสด" class="pay-radio" checked> 💵 เงินสด</label>
-        <label class="pay-label"><input type="radio" name="payType" value="เงินเซ็น" class="pay-radio"> 📝 เงินเซ็น</label>
+        <label class="me-3 pay-label"><input type="radio" name="payType" value="ไม่ชำระ" class="pay-radio" checked> 📝 ยังไม่ชำระ (เงินเซ็น)</label>
+        <label class="pay-label"><input type="radio" name="payType" value="ชำระ" class="pay-radio"> 💵 ชำระแล้ว (เงินสด)</label>
       </div>
     </div>
     <button class="btn btn-success fw-bold px-3 py-2 shadow" id="btn-confirm" onclick="confirmBooking()">ยืนยันคว้าโชค <i class="bi bi-check-circle"></i></button>
@@ -326,18 +322,14 @@
   const loader = document.getElementById('loader');
   let currentUsername = ""; let currentFullName = ""; let selectedItems = []; 
   let hasShownWinAlert = false; let globalAllUsers = []; let isSystemClosed = false;
+  let globalBookedGroups = []; // เก็บข้อมูลกลุ่มที่จองไว้สำหรับการแก้ไขสถานะชำระ
 
-  // ==========================================
-  // ระบบสลับธีม (Dark / Light Mode)
-  // ==========================================
   function toggleTheme() {
     const html = document.documentElement;
     const currentTheme = html.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
     html.setAttribute('data-theme', newTheme);
     localStorage.setItem('preferredTheme', newTheme); 
-    
     updateThemeUI(newTheme);
   }
 
@@ -353,7 +345,6 @@
     const userBtn = document.getElementById('user-theme-btn');
     if(userBtn) userBtn.innerHTML = isDark ? '<i class="bi bi-sun-fill text-warning fs-5"></i>' : '<i class="bi bi-moon-stars-fill fs-5"></i>';
 
-    // Login Form Colors
     if(document.getElementById('login-title')) {
        document.getElementById('login-title').className = isDark ? 'text-center mb-4 text-warning' : 'text-center mb-4 text-primary';
        document.getElementById('btn-login').className = isDark ? 'btn w-100 fw-bold btn-warning text-dark' : 'btn btn-primary w-100 fw-bold';
@@ -362,7 +353,6 @@
        document.getElementById('link-back-login').className = isDark ? 'text-warning text-decoration-none fw-bold' : 'text-success text-decoration-none fw-bold';
     }
 
-    // Admin Table Colors
     const tables = ['admin-table-1', 'admin-table-2'];
     tables.forEach(id => {
       const tb = document.getElementById(id);
@@ -381,39 +371,31 @@
       }
     });
 
-    // Admin Buttons
     if(document.getElementById('btn-set-time')) {
         document.getElementById('btn-set-time').className = isDark ? 'btn btn-warning w-100 fw-bold' : 'btn btn-outline-secondary w-100 fw-bold';
         document.getElementById('btn-save-win').className = isDark ? 'btn btn-success w-100 fw-bold' : 'btn btn-primary w-100 fw-bold';
     }
 
-    // User Colors
     if(document.getElementById('user-brand')) {
        document.getElementById('user-brand').className = isDark ? 'navbar-brand mb-0 h4 fw-bold text-warning' : 'navbar-brand mb-0 h4 fw-bold text-white';
        document.getElementById('alert-icon').className = isDark ? 'bi bi-person-circle text-warning' : 'bi bi-info-circle-fill text-primary';
        document.getElementById('user-welcome-name').className = isDark ? 'text-warning fs-5' : 'text-primary fs-5';
        document.getElementById('btn-confirm').className = isDark ? 'btn fw-bold px-3 py-2 shadow-lg btn-warning text-dark border-0' : 'btn btn-success fw-bold px-3 py-2 shadow';
-       document.getElementById('bar-text-main').className = isDark ? 'fw-bold fs-5 text-warning' : 'fw-bold fs-5';
+       document.getElementById('bar-text-main').className = isDark ? 'fw-bold fs-5 text-warning' : 'fw-bold fs-5 text-white';
        document.getElementById('selected-count').className = isDark ? 'text-white' : 'text-warning';
     }
     
-    // Loader Colors
     if(document.getElementById('loader-spinner')) {
         document.getElementById('loader-spinner').className = isDark ? 'spinner-border text-warning' : 'spinner-border text-primary';
         document.getElementById('loader-text').className = isDark ? 'mt-3 fw-bold text-warning' : 'mt-3 fw-bold text-primary';
     }
   }
 
-  // โหลดธีมตอนเริ่มต้น
   document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('preferredTheme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
     updateThemeUI(savedTheme);
   });
-
-  // ==========================================
-  // ส่วนการทำงานหลัก (API, Auth, Admin, User)
-  // ==========================================
 
   async function apiCall(action, payload = {}) {
     try {
@@ -513,7 +495,7 @@
       winnersSection.classList.remove('hidden');
       winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-warning py-2 mb-2 border-warning d-flex justify-content-between align-items-center bg-dark text-white"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-warning fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
     } else if (res.winners.top || res.winners.bot) {
-       winnersSection.classList.remove('hidden'); winnersList.innerHTML = `<div class="text-muted small">ไม่มีผู้ถูกรางวัลในรอUpี้</div>`;
+       winnersSection.classList.remove('hidden'); winnersList.innerHTML = `<div class="text-muted small">เจ้ามือกินเรียบงวดนี้ 😎</div>`;
     } else winnersSection.classList.add('hidden');
     
     globalAllUsers = res.allUsers;
@@ -532,7 +514,7 @@
         
         actionBtns += `<button class="btn btn-sm ${btnClass} me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm ${btnDelClass} mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
         
-        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="text-muted fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${u.time}</small></td><td class="text-muted">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
+        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="time-bright fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${u.time}</small></td><td class="text-muted">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
       }).join('');
     }
 
@@ -543,19 +525,51 @@
       res.bookedList.forEach(b => {
         const key = b.bookedBy + '_' + b.payType + '_' + b.time; 
         if(!groupedData[key]) groupedData[key] = { name: b.bookedBy, payType: b.payType, time: b.time, topNums: [], botNums: [], totalPrice: 0 };
+        // แก้ไข: ค้นหาคำว่า (Up) หรือ (Down)
         if(b.number.includes('(Up)')) groupedData[key].topNums.push(b.number.replace(' (Up)', '').trim());
         else if(b.number.includes('(Down)')) groupedData[key].botNums.push(b.number.replace(' (Down)', '').trim());
         groupedData[key].totalPrice += 100;
       });
-      tbodyBooked.innerHTML = Object.values(groupedData).map(g => {
+      
+      globalBookedGroups = Object.values(groupedData); // เก็บไว้ใช้ตอนกดปุ่มสลับสถานะ
+      
+      tbodyBooked.innerHTML = globalBookedGroups.map(g => {
         let numHtml = '';
-        // แก้สีคำว่า Up / Down ให้สว่างขึ้น
-        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small fw-bold me-1">Up:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small fw-bold me-1" style="color: #0dcaf0 !important;">Down:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        if(g.botNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
         
-        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
+        // ปุ่มสลับสถานะชำระเงิน
+        let payBadgeClass = (g.payType === 'ชำระ' || g.payType === 'เงินสด') ? 'bg-success' : 'bg-danger';
+        let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='togglePayStatus("${g.name}", "${g.payType}", "${g.time}")'><i class="bi bi-arrow-repeat"></i></button>`;
+
+        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="time-bright fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${payBadgeClass}">${g.payType}</span>${togglePayBtn}</td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
       }).join('');
     }
+  }
+
+  // ฟังก์ชันยิง API เปลี่ยนสถานะ ชำระ/ไม่ชำระ
+  function togglePayStatus(name, currentPayType, time) {
+    const group = globalBookedGroups.find(g => g.name === name && g.payType === currentPayType && g.time === time);
+    if(!group) return;
+
+    Swal.fire({
+      title: 'เปลี่ยนสถานะ?',
+      text: `ต้องการเปลี่ยนสถานะจาก "${currentPayType}" ใช่หรือไม่?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'เปลี่ยน',
+      cancelButtonText: 'ยกเลิก'
+    }).then(async (r) => {
+      if (r.isConfirmed) {
+        loader.classList.remove('hidden');
+        const res = await apiCall('togglePayment', { topNums: group.topNums, botNums: group.botNums, currentStatus: currentPayType });
+        loader.classList.add('hidden');
+        if (res.success) {
+          Swal.fire({title: 'สำเร็จ', text: res.message, icon: 'success', timer: 1000, showConfirmButton: false});
+          refreshAdminData();
+        } else Swal.fire('ผิดพลาด', res.message, 'error');
+      }
+    });
   }
 
   async function adminAction(action, payload, successMsg) {
@@ -694,7 +708,7 @@
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
-      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>ชำระแบบ: <b class="text-primary">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
+      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>ชำระแบบ: <b class="text-warning">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
       icon: 'info', showCancelButton: true, confirmButtonText: 'ยืนยันจอง!', confirmButtonColor: '#198754', cancelButtonText: 'ยกเลิก'
     }).then(async (r) => {
       if (r.isConfirmed) {
