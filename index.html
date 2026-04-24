@@ -86,7 +86,7 @@
     .num-btn.selected .booked-name { color: #ffffff !important; }
     [data-theme="dark"] .num-btn.booked .booked-name { text-decoration: line-through; }
 
-    /* แถบเมนูด้านล่าง */
+    /* แถบเมนูด้านDown */
     .booking-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bar-bg); color: var(--bar-text); padding: 10px 20px; z-index: 1000; box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: 0.3s; }
     [data-theme="dark"] .booking-bar { border-top: 2px solid #ffd700; background: rgba(10, 15, 25, 0.95); color: #ffffff; }
     
@@ -107,7 +107,7 @@
     .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .card-stats:hover { transform: translateY(-5px); }
     
-    /* แจ็คพอตแบนเนอร์ (ตอนนี้โชว์ทั้งโหมดสว่างและมืด) */
+    /* แจ็คพอตแUpเนอร์ (ตอนนี้โชว์ทั้งโหมดสว่างและมืด) */
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
 
     /* กล่อง Card ทั่วไป */
@@ -142,7 +142,7 @@
   <div class="card shadow-sm p-4" style="border-radius: 12px;">
     
     <div id="login-section">
-      <h3 class="text-center mb-4 text-primary" id="login-title"><b>เข้าสู่ระบบ เบอร์ทอง</b></h3>
+      <h3 class="text-center mb-4 text-primary" id="login-title"><b>เข้าสู่ระบบ ลุ้นโชค</b></h3>
       
       <div class="mb-3 text-start">
         <label class="form-label text-muted small mb-1">ชื่อผู้ใช้งาน (Username)</label>
@@ -217,11 +217,11 @@
 
           <div class="row g-2 align-items-end p-2 rounded border" style="background-color: rgba(0,0,0,0.05); border-color: var(--card-border) !important;">
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (บน)</label>
+              <label class="form-label small text-muted">เลขที่ออก (Up)</label>
               <input type="number" id="input-win-top" class="form-control border-success text-center fw-bold text-success fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
-              <label class="form-label small text-muted">เลขที่ออก (ล่าง)</label>
+              <label class="form-label small text-muted">เลขที่ออก (Down)</label>
               <input type="number" id="input-win-bot" class="form-control border-danger text-center fw-bold text-danger fs-5" placeholder="--">
             </div>
             <div class="col-md-4">
@@ -238,7 +238,7 @@
         </div>
       </div>
 
-      <h4 class="mb-3" style="color: var(--text-color);"><i class="bi bi-speedometer2"></i> ภาพรวมระบบ (บน-ล่าง)</h4>
+      <h4 class="mb-3" style="color: var(--text-color);"><i class="bi bi-speedometer2"></i> ภาพรวมระบบ (Up-Down)</h4>
       <div class="row g-3 mb-4">
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-primary"><small class="text-muted">รายการคงเหลือ</small><h3 id="stat-rem" class="mb-0 text-primary">-</h3></div></div>
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="text-muted">โดนจองแล้ว</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
@@ -302,7 +302,7 @@
     </div>
 
     <div id="user-alert-banner" class="alert shadow-sm d-flex justify-content-between align-items-center flex-wrap" style="background-color: var(--alert-bg); border: 1px solid var(--alert-border); color: var(--text-color);">
-      <div><i class="bi bi-person-circle text-primary" id="alert-icon"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name" class="text-primary fs-5"></b>! กดเลือก <b>บน</b> หรือ <b>ล่าง</b> ได้ตามใจชอบเลยครับ</div>
+      <div><i class="bi bi-person-circle text-primary" id="alert-icon"></i> ยินดีต้อนรับคุณ <b id="user-welcome-name" class="text-primary fs-5"></b>! กดเลือก <b>Up</b> หรือ <b>Down</b> ได้ตามใจชอบเลยครับ</div>
       <div id="user-time-display" class="badge bg-warning text-dark fs-6 mt-2 mt-md-0 hidden"></div>
     </div>
     
@@ -513,7 +513,7 @@
       winnersSection.classList.remove('hidden');
       winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-warning py-2 mb-2 border-warning d-flex justify-content-between align-items-center bg-dark text-white"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-warning fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
     } else if (res.winners.top || res.winners.bot) {
-       winnersSection.classList.remove('hidden'); winnersList.innerHTML = `<div class="text-muted small">ไม่มีผู้ถูกรางวัลในรอบนี้</div>`;
+       winnersSection.classList.remove('hidden'); winnersList.innerHTML = `<div class="text-muted small">ไม่มีผู้ถูกรางวัลในรอUpี้</div>`;
     } else winnersSection.classList.add('hidden');
     
     globalAllUsers = res.allUsers;
@@ -543,15 +543,15 @@
       res.bookedList.forEach(b => {
         const key = b.bookedBy + '_' + b.payType + '_' + b.time; 
         if(!groupedData[key]) groupedData[key] = { name: b.bookedBy, payType: b.payType, time: b.time, topNums: [], botNums: [], totalPrice: 0 };
-        if(b.number.includes('(บน)')) groupedData[key].topNums.push(b.number.replace(' (บน)', '').trim());
-        else if(b.number.includes('(ล่าง)')) groupedData[key].botNums.push(b.number.replace(' (ล่าง)', '').trim());
+        if(b.number.includes('(Up)')) groupedData[key].topNums.push(b.number.replace(' (Up)', '').trim());
+        else if(b.number.includes('(Down)')) groupedData[key].botNums.push(b.number.replace(' (Down)', '').trim());
         groupedData[key].totalPrice += 100;
       });
       tbodyBooked.innerHTML = Object.values(groupedData).map(g => {
         let numHtml = '';
-        // แก้สีคำว่า บน / ล่าง ให้สว่างขึ้น
-        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small fw-bold me-1">บน:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small fw-bold me-1" style="color: #0dcaf0 !important;">ล่าง:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        // แก้สีคำว่า Up / Down ให้สว่างขึ้น
+        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="text-warning small fw-bold me-1">Up:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+        if(g.botNums.length > 0) numHtml += `<div><span class="text-info small fw-bold me-1" style="color: #0dcaf0 !important;">Down:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
         
         return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="text-muted fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${g.payType === 'เงินสด' ? 'bg-success' : 'bg-secondary'}">${g.payType}</span></td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
       }).join('');
@@ -627,11 +627,11 @@
       let topBadge = ''; let botBadge = '';
       if(data.winners.top && item.number === data.winners.top) {
         topBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
-        if(isTopBooked && item.top.user === currentFullName) { myWinnings.push(`บน ${item.number}`); totalPrize += 6000; }
+        if(isTopBooked && item.top.user === currentFullName) { myWinnings.push(`Up ${item.number}`); totalPrize += 6000; }
       }
       if(data.winners.bot && item.number === data.winners.bot) {
         botBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
-        if(isBotBooked && item.bottom.user === currentFullName) { myWinnings.push(`ล่าง ${item.number}`); totalPrize += 6000; }
+        if(isBotBooked && item.bottom.user === currentFullName) { myWinnings.push(`Down ${item.number}`); totalPrize += 6000; }
       }
       
       grid.innerHTML += `
@@ -640,10 +640,10 @@
             <div class="num-header">${item.number}</div>
             <div class="d-flex position-relative">
               <div id="btn-${item.number}-Top" class="num-btn top-btn position-relative ${topClass}" onclick="toggleSelection('${item.number}', 'Top', ${isTopBooked})">
-                ${topBadge}<b>บน</b><br><span class="booked-name" title="${topText}">${topText}</span>
+                ${topBadge}<b>Up</b><br><span class="booked-name" title="${topText}">${topText}</span>
               </div>
               <div id="btn-${item.number}-Bottom" class="num-btn position-relative ${botClass}" onclick="toggleSelection('${item.number}', 'Bottom', ${isBotBooked})">
-                ${botBadge}<b>ล่าง</b><br><span class="booked-name" title="${botText}">${botText}</span>
+                ${botBadge}<b>Down</b><br><span class="booked-name" title="${botText}">${botText}</span>
               </div>
             </div>
           </div>
@@ -689,8 +689,8 @@
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const boxClass = isDark ? 'bg-dark text-white border-secondary' : 'bg-light text-dark border';
 
-    if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">บน</span> <b class="text-danger fs-5">${topNums.join(', ')}</b></div>`;
-    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">ล่าง</span> <b class="text-info fs-5" style="color: #0dcaf0 !important;">${botNums.join(', ')}</b></div>`;
+    if (topNums.length > 0) dHtml += `<div class="mb-2"><span class="badge bg-danger me-2">Up</span> <b class="text-danger fs-5">${topNums.join(', ')}</b></div>`;
+    if (botNums.length > 0) dHtml += `<div><span class="badge bg-info text-dark me-2">Down</span> <b class="text-info fs-5" style="color: #0dcaf0 !important;">${botNums.join(', ')}</b></div>`;
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
