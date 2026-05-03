@@ -250,7 +250,6 @@
         </div>
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="lbl-bright">โดนจองแล้วรวม</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
         
-        <!-- แสดงยอดเงินค้าง/จ่าย กระดานปัจจุบัน -->
         <div class="col-12 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-warning">
             <small class="lbl-bright">รายได้รวมงวดนี้ (บาท)</small>
@@ -274,7 +273,7 @@
       </div>
     </div>
     
-    <!-- 2. หน้าประวัติ & ยอดค้าง (เมนูใหม่) -->
+    <!-- 2. หน้าประวัติ & ยอดค้าง -->
     <div id="admin-view-history" class="hidden">
       <h4 class="mb-3 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
       
@@ -296,7 +295,7 @@
       <div class="card shadow-sm border-0">
         <div class="card-body p-0 table-responsive">
           <table class="table table-hover align-middle mb-0" id="admin-table-3">
-            <thead id="admin-thead-3"><tr><th class="ps-4">งวดวันที่ / ล้างกระดาน</th><th>ชื่อผู้จอง</th><th>รายการเบอร์</th><th class="text-end">ยอดเงิน</th><th class="pe-4">สถานะชำระ</th></tr></thead>
+            <thead id="admin-thead-3"><tr><th class="ps-4">งวดวันที่ / ล้างกระดาน</th><th>ชื่อผู้จอง</th><th>รายการเบอร์</th><th class="text-end">ยอดเงิน</th><th class="pe-4 ps-4">สถานะชำระ</th></tr></thead>
             <tbody id="history-table-body"></tbody>
           </table>
         </div>
@@ -324,7 +323,6 @@
     <div class="offcanvas-body p-0">
       <div class="list-group list-group-flush mt-2">
         <div id="menu-dashboard" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 me-2"></i> แดชบอร์ดปัจจุบัน</div>
-        <!-- เมนูใหม่ สำหรับเข้าหน้าประวัติ -->
         <div id="menu-history" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('history')"><i class="bi bi-journal-text me-2"></i> ประวัติการซื้อ & ยอดค้าง</div>
         <div id="menu-users" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
       </div>
@@ -520,7 +518,6 @@
     refreshAdminData();
   }
   
-  // สลับแท็บในเมนู Admin
   function switchAdminView(view) {
     document.getElementById('admin-view-dashboard').classList.add('hidden');
     document.getElementById('admin-view-users').classList.add('hidden');
@@ -542,7 +539,7 @@
     else if(view === 'history') {
       document.getElementById('admin-view-history').classList.remove('hidden');
       document.getElementById('menu-history').classList.add('active'); 
-      loadHistoryData(); // เรียกดึงข้อมูลประวัติ
+      loadHistoryData(); 
     }
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('adminMenu'));
     if(offcanvas) offcanvas.hide();
@@ -623,7 +620,7 @@
     }
   }
 
-  // ดึงข้อมูลประวัติการเงิน
+  // --- ดึงข้อมูลประวัติการเงินแบบแยกบรรทัด Up/Down ---
   async function loadHistoryData() {
     loader.classList.remove('hidden');
     const res = await apiCall('getHistoryData');
@@ -642,18 +639,40 @@
         let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
         let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='toggleHistPay(${h.row}, "${h.status}")'><i class="bi bi-arrow-repeat"></i></button>`;
         
+        // แก้ไขวันที่ ที่โชว์ยาวๆ (เวลาอินโดจีน) ให้สั้นลง
+        let displayDrawDate = h.drawDate;
+        if(displayDrawDate.length > 20) {
+          try { displayDrawDate = formatThaiDateTime(h.drawDate); } catch(e) {}
+        }
+
+        // จัดกลุ่ม Up / Down ให้แยกบรรทัดกันแบบหน้ากระดานปัจจุบัน
+        let upNums = [];
+        let downNums = [];
+        if(h.numbers) {
+          h.numbers.split(',').forEach(n => {
+            let numStr = n.trim();
+            if(numStr.includes('(Up)')) upNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Up)', '').trim()}</span>`);
+            else if(numStr.includes('(Down)')) downNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Down)', '').trim()}</span>`);
+            else if(numStr !== '') upNums.push(`<span class="badge bg-secondary me-1">${numStr}</span>`);
+          });
+        }
+        
+        let numHtml = '';
+        if(upNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${upNums.join('')}</div>`;
+        if(downNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${downNums.join('')}</div>`;
+        if(numHtml === '') numHtml = h.numbers; // กันเหนียวเผื่อระบบเก่า
+
         return `<tr>
-          <td class="ps-4 text-muted small fw-bold">${h.drawDate}<br><span style="font-size:0.65rem;" class="time-bright fw-normal"><i class="bi bi-clock"></i> ${h.timestamp}</span></td>
+          <td class="ps-4 text-muted small fw-bold">${displayDrawDate}<br><span style="font-size:0.65rem;" class="time-bright fw-normal"><i class="bi bi-clock"></i> ${h.timestamp}</span></td>
           <td class="fw-bold">${h.name}</td>
-          <td class="small time-bright" style="white-space: normal; max-width: 150px;">${h.numbers}</td>
+          <td class="small time-bright" style="white-space: normal; min-width: 150px;">${numHtml}</td>
           <td class="text-end text-warning fw-bold">${h.amount.toLocaleString()}</td>
-          <td class="pe-4"><span class="badge ${payBadgeClass}">${h.status}</span>${togglePayBtn}</td>
+          <td class="pe-4 ps-4"><span class="badge ${payBadgeClass}">${h.status}</span>${togglePayBtn}</td>
         </tr>`;
       }).join('');
     }
   }
 
-  // ฟังก์ชันเปลี่ยนสถานะชำระเงิน ในหน้าประวัติย้อนหลัง
   function toggleHistPay(row, currentStatus) {
     Swal.fire({
       title: 'เปลี่ยนสถานะในประวัติ?',
@@ -666,13 +685,12 @@
         loader.classList.add('hidden');
         if (res.success) {
           Swal.fire({title: 'สำเร็จ', text: res.message, icon: 'success', timer: 1000, showConfirmButton: false});
-          loadHistoryData(); // โหลดข้อมูลประวัติใหม่
+          loadHistoryData(); 
         } else Swal.fire('ผิดพลาด', res.message, 'error');
       }
     });
   }
 
-  // เปลี่ยนสถานะชำระเงิน ของกระดานปัจจุบัน
   function togglePayStatus(name, currentPayType, time) {
     const group = globalBookedGroups.find(g => g.name === name && g.payType === currentPayType && g.time === time);
     if(!group) return;
