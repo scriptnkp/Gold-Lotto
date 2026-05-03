@@ -273,18 +273,25 @@
       </div>
     </div>
     
-    <!-- 2. หน้าประวัติ & ยอดค้าง -->
+    <!-- 2. หน้าประวัติ & ยอดค้าง (เมนูใหม่) -->
     <div id="admin-view-history" class="hidden">
       <h4 class="mb-3 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
       
+      <!-- เพิ่มกล่องสถิติ "ยอดรวม" ให้ครบ 3 กล่อง -->
       <div class="row g-3 mb-4">
-        <div class="col-6">
+        <div class="col-12 col-md-4">
+          <div class="card p-3 shadow-sm card-stats border-primary">
+            <small class="lbl-bright">ยอดจองทั้งหมด (สะสมรวม)</small>
+            <h3 id="hist-total" class="mb-0 text-primary">0</h3>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-success">
             <small class="lbl-bright">ยอดรับชำระแล้ว (สะสมรวม)</small>
             <h3 id="hist-paid" class="mb-0 text-success">0</h3>
           </div>
         </div>
-        <div class="col-6">
+        <div class="col-6 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-danger">
             <small class="lbl-bright">ยอดค้างชำระ (สะสมรวม)</small>
             <h3 id="hist-unpaid" class="mb-0 text-danger">0</h3>
@@ -620,13 +627,16 @@
     }
   }
 
-  // --- ดึงข้อมูลประวัติการเงินแบบแยกบรรทัด Up/Down ---
+  // --- ดึงข้อมูลประวัติการเงิน ---
   async function loadHistoryData() {
     loader.classList.remove('hidden');
     const res = await apiCall('getHistoryData');
     loader.classList.add('hidden');
     if(!res || !res.success) return;
 
+    // อัปเดตตัวเลขในกล่องสถิติของหน้า History
+    let totalAll = res.totalPaid + res.totalUnpaid;
+    document.getElementById('hist-total').innerText = totalAll.toLocaleString();
     document.getElementById('hist-paid').innerText = res.totalPaid.toLocaleString();
     document.getElementById('hist-unpaid').innerText = res.totalUnpaid.toLocaleString();
 
@@ -639,13 +649,11 @@
         let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
         let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='toggleHistPay(${h.row}, "${h.status}")'><i class="bi bi-arrow-repeat"></i></button>`;
         
-        // แก้ไขวันที่ ที่โชว์ยาวๆ (เวลาอินโดจีน) ให้สั้นลง
         let displayDrawDate = h.drawDate;
         if(displayDrawDate.length > 20) {
           try { displayDrawDate = formatThaiDateTime(h.drawDate); } catch(e) {}
         }
 
-        // จัดกลุ่ม Up / Down ให้แยกบรรทัดกันแบบหน้ากระดานปัจจุบัน
         let upNums = [];
         let downNums = [];
         if(h.numbers) {
@@ -660,7 +668,7 @@
         let numHtml = '';
         if(upNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${upNums.join('')}</div>`;
         if(downNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${downNums.join('')}</div>`;
-        if(numHtml === '') numHtml = h.numbers; // กันเหนียวเผื่อระบบเก่า
+        if(numHtml === '') numHtml = h.numbers; 
 
         return `<tr>
           <td class="ps-4 text-muted small fw-bold">${displayDrawDate}<br><span style="font-size:0.65rem;" class="time-bright fw-normal"><i class="bi bi-clock"></i> ${h.timestamp}</span></td>
