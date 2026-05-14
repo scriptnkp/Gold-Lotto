@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- เพิ่ม SheetJS สำหรับ Export Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
   <script>
     // ⚠️ URL Web App ประจำโปรเจกต์
@@ -275,7 +277,11 @@
     
     <!-- 2. หน้าประวัติ & ยอดค้าง (เมนูใหม่) -->
     <div id="admin-view-history" class="hidden">
-      <h4 class="mb-3 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
+        <!-- ปุ่มส่งออก Excel -->
+        <button class="btn btn-success btn-sm fw-bold shadow-sm" onclick="exportHistoryToExcel()"><i class="bi bi-file-earmark-excel-fill"></i> Export Excel</button>
+      </div>
       
       <!-- เพิ่มกล่องสถิติ "ยอดรวม" ให้ครบ 3 กล่อง -->
       <div class="row g-3 mb-4">
@@ -389,6 +395,7 @@
   let currentUsername = ""; let currentFullName = ""; let selectedItems = []; 
   let hasShownWinAlert = false; let globalAllUsers = []; let isSystemClosed = false;
   let globalBookedGroups = []; 
+  let globalHistoryData = []; // ไว้เก็บข้อมูลสำหรับ Export Excel
 
   function toggleTheme() {
     const html = document.documentElement;
@@ -627,14 +634,15 @@
     }
   }
 
-  // --- ดึงข้อมูลประวัติการเงิน ---
+  // --- ดึงข้อมูลประวัติการเงินแบบแยกบรรทัด Up/Down ---
   async function loadHistoryData() {
     loader.classList.remove('hidden');
     const res = await apiCall('getHistoryData');
     loader.classList.add('hidden');
     if(!res || !res.success) return;
 
-    // อัปเดตตัวเลขในกล่องสถิติของหน้า History
+    globalHistoryData = res.list; // เก็บข้อมูลดิบสำหรับ Export Excel
+
     let totalAll = res.totalPaid + res.totalUnpaid;
     document.getElementById('hist-total').innerText = totalAll.toLocaleString();
     document.getElementById('hist-paid').innerText = res.totalPaid.toLocaleString();
@@ -679,6 +687,38 @@
         </tr>`;
       }).join('');
     }
+  }
+
+  // --- ฟังก์ชันสำหรับส่งออกไฟล์ Excel ---
+  function exportHistoryToExcel() {
+    if (!globalHistoryData || globalHistoryData.length === 0) {
+      Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลประวัติสำหรับการส่งออก Excel', 'warning');
+      return;
+    }
+    
+    // จัดรูปแบบข้อมูลสำหรับใส่ Excel
+    const exportData = globalHistoryData.map(h => {
+      let displayDate = h.drawDate;
+      if(displayDate.length > 20) {
+          try { displayDate = formatThaiDateTime(h.drawDate); } catch(e) {}
+      }
+      return {
+        "งวดวันที่": displayDate,
+        "วันที่ทำรายการ / ล้างกระดาน": h.timestamp,
+        "ชื่อผู้จอง": h.name,
+        "รายการเบอร์": h.numbers,
+        "ยอดเงิน (บาท)": h.amount,
+        "สถานะชำระ": h.status
+      };
+    });
+
+    // สร้าง Workbook และ Worksheet ผ่าน SheetJS
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "History");
+
+    // บันทึกและดาวน์โหลดไฟล์
+    XLSX.writeFile(wb, "GoldenLuck_History.xlsx");
   }
 
   function toggleHistPay(row, currentStatus) {
