@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- เพิ่ม SheetJS สำหรับ Export Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
   <script>
@@ -66,7 +65,6 @@
     }
 
     .text-muted { color: var(--text-muted) !important; }
-
     body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Sarabun', sans-serif; padding-bottom: 90px; transition: background-color 0.3s, color 0.3s; }
     .hidden { display: none !important; }
     
@@ -151,7 +149,6 @@
         <label class="form-label lbl-bright small mb-1">รหัสผ่าน (Password)</label>
         <input type="password" id="l-pass" class="form-control" placeholder="กรอกรหัสผ่าน">
       </div>
-      
       <button class="btn btn-primary w-100 fw-bold" id="btn-login" onclick="login()">เข้าสู่ระบบ</button>
       <div class="text-center mt-3 small lbl-bright">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-primary text-decoration-none fw-bold" id="link-register" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
     </div>
@@ -161,6 +158,10 @@
       <div class="mb-3 text-start">
         <label class="form-label lbl-bright small mb-1">ชื่อ - นามสกุลจริง (เพื่อรับรางวัล)</label>
         <input type="text" id="r-name" class="form-control" placeholder="เช่น สมชาย ใจดี">
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label lbl-bright small mb-1">สาขา/พื้นที่ (เช่น นครพนม, ธาตุพนม)</label>
+        <input type="text" id="r-location" class="form-control" placeholder="กรอกสาขาหรือพื้นที่">
       </div>
       <div class="mb-3 text-start">
         <label class="form-label lbl-bright small mb-1">ตั้งชื่อผู้ใช้งาน (Username)</label>
@@ -251,7 +252,6 @@
           </div>
         </div>
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="lbl-bright">โดนจองแล้วรวม</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
-        
         <div class="col-12 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-warning">
             <small class="lbl-bright">รายได้รวมงวดนี้ (บาท)</small>
@@ -275,15 +275,13 @@
       </div>
     </div>
     
-    <!-- 2. หน้าประวัติ & ยอดค้าง (เมนูใหม่) -->
+    <!-- 2. หน้าประวัติ & ยอดค้าง -->
     <div id="admin-view-history" class="hidden">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
-        <!-- ปุ่มส่งออก Excel -->
         <button class="btn btn-success btn-sm fw-bold shadow-sm" onclick="exportHistoryToExcel()"><i class="bi bi-file-earmark-excel-fill"></i> Export Excel</button>
       </div>
       
-      <!-- เพิ่มกล่องสถิติ "ยอดรวม" ให้ครบ 3 กล่อง -->
       <div class="row g-3 mb-4">
         <div class="col-12 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-primary">
@@ -321,12 +319,58 @@
       <div class="card shadow-sm border-0">
         <div class="card-body p-0 table-responsive">
           <table class="table table-hover align-middle mb-0" id="admin-table-2">
-            <thead id="admin-thead-2"><tr><th class="ps-4">ชื่อ - นามสกุล</th><th>Username</th><th>สถานะ</th><th class="text-end pe-4">จัดการ</th></tr></thead>
+            <thead id="admin-thead-2"><tr><th class="ps-4">ชื่อ - นามสกุล</th><th>พื้นที่/สาขา</th><th>Username</th><th>สถานะ</th><th class="text-end pe-4">จัดการ</th></tr></thead>
             <tbody id="all-users-table-body"></tbody>
           </table>
         </div>
       </div>
     </div>
+    
+    <!-- 4. หน้าคำนวณส่วนแบ่ง (เมนูใหม่ + เพิ่มหักเปอร์เซ็นต์สำรอง) -->
+    <div id="admin-view-allocation" class="hidden">
+        <h4 class="mb-3 text-info"><i class="bi bi-pie-chart-fill"></i> คำนวณส่วนแบ่งรายได้ (ตามพื้นที่)</h4>
+        <div class="card shadow-sm border-0 mb-4 border-top border-info border-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-info">เลือกงวดที่ต้องการคำนวณ</label>
+                        <select id="allocation-draw-select" class="form-select" onchange="updateAllocationStats()"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-success">ยอดจองรวม (บาท)</label>
+                        <input type="number" id="allocation-total-sales" class="form-control fw-bold text-success" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-danger">หักจ่ายรางวัลแจ็คพอต (บาท)</label>
+                        <input type="number" id="allocation-payouts" class="form-control fw-bold text-danger" value="0" oninput="updateAllocationNetProfit()">
+                    </div>
+                </div>
+                
+                <div class="row g-3 mt-2 align-items-end border-top pt-3" style="border-color: var(--card-border) !important;">
+                    <div class="col-md-4">
+                        <!-- ช่องใหม่ หักสำรอง % -->
+                        <label class="form-label fw-bold text-warning">หักเข้ากองกลางสำรอง (%)</label>
+                        <div class="input-group shadow-sm">
+                            <input type="number" id="allocation-reserve-pct" class="form-control fw-bold text-warning" value="0" min="0" max="100" oninput="updateAllocationNetProfit()">
+                            <span class="input-group-text" style="background-color: var(--input-bg); color: var(--input-text); border-color: var(--card-border);">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold text-primary fs-5">กำไรสุทธิที่จะนำมาแบ่ง (บาท)</label>
+                        <input type="number" id="allocation-net-profit" class="form-control fs-4 fw-bold text-primary" readonly>
+                        <small class="text-muted" id="reserve-amount-display">หักสำรอง: 0 บาท</small>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-info text-white w-100 fw-bold fs-5 shadow-sm" onclick="calculateAllocation()"><i class="bi bi-calculator"></i> แบ่ง %</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- แสดงผลลัพธ์การคำนวณ -->
+        <div id="allocation-results" class="mt-4"></div>
+    </div>
+
   </div>
 
   <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="adminMenu">
@@ -337,6 +381,7 @@
       <div class="list-group list-group-flush mt-2">
         <div id="menu-dashboard" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary active" onclick="switchAdminView('dashboard')"><i class="bi bi-speedometer2 me-2"></i> แดชบอร์ดปัจจุบัน</div>
         <div id="menu-history" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('history')"><i class="bi bi-journal-text me-2"></i> ประวัติการซื้อ & ยอดค้าง</div>
+        <div id="menu-allocation" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('allocation')"><i class="bi bi-pie-chart-fill me-2"></i> สัดส่วนรายได้ตามพื้นที่</div>
         <div id="menu-users" class="list-group-item bg-dark admin-menu-item fs-5 py-3 border-secondary" onclick="switchAdminView('users')"><i class="bi bi-people-fill me-2"></i> จัดการ User <span id="pending-badge" class="badge bg-danger rounded-pill float-end hidden">0</span></div>
       </div>
     </div>
@@ -395,7 +440,7 @@
   let currentUsername = ""; let currentFullName = ""; let selectedItems = []; 
   let hasShownWinAlert = false; let globalAllUsers = []; let isSystemClosed = false;
   let globalBookedGroups = []; 
-  let globalHistoryData = []; // ไว้เก็บข้อมูลสำหรับ Export Excel
+  let globalHistoryData = []; 
 
   function toggleTheme() {
     const html = document.documentElement;
@@ -516,7 +561,12 @@
   }
 
   async function register() {
-    const data = { name: document.getElementById('r-name').value.trim(), username: document.getElementById('r-user').value.trim(), password: document.getElementById('r-pass').value.trim() };
+    const data = { 
+      name: document.getElementById('r-name').value.trim(), 
+      username: document.getElementById('r-user').value.trim(), 
+      password: document.getElementById('r-pass').value.trim(),
+      location: document.getElementById('r-location').value.trim() || "ไม่ระบุ"
+    };
     if(!data.name || !data.username || !data.password) return Swal.fire('แจ้งเตือน', 'กรุณากรอกให้ครบ', 'warning');
     loader.classList.remove('hidden');
     const res = await apiCall('register', data);
@@ -536,10 +586,12 @@
     document.getElementById('admin-view-dashboard').classList.add('hidden');
     document.getElementById('admin-view-users').classList.add('hidden');
     document.getElementById('admin-view-history').classList.add('hidden');
+    document.getElementById('admin-view-allocation').classList.add('hidden');
     
     document.getElementById('menu-dashboard').classList.remove('active');
     document.getElementById('menu-users').classList.remove('active');
     document.getElementById('menu-history').classList.remove('active');
+    document.getElementById('menu-allocation').classList.remove('active');
 
     if(view === 'dashboard') {
       document.getElementById('admin-view-dashboard').classList.remove('hidden');
@@ -555,93 +607,244 @@
       document.getElementById('menu-history').classList.add('active'); 
       loadHistoryData(); 
     }
+    else if(view === 'allocation') {
+      document.getElementById('admin-view-allocation').classList.remove('hidden');
+      document.getElementById('menu-allocation').classList.add('active'); 
+      loadHistoryData().then(() => updateAllocationStats());
+    }
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('adminMenu'));
     if(offcanvas) offcanvas.hide();
   }
 
-  async function refreshAdminData() {
+  async function refreshAdminData(updateUI = true) {
+    if(updateUI) loader.classList.remove('hidden');
     const res = await apiCall('getAdminData');
+    if(updateUI) loader.classList.add('hidden');
     if(!res) return;
 
-    document.getElementById('stat-rem-up').innerText = res.stats.remTop;
-    document.getElementById('stat-rem-down').innerText = res.stats.remBot;
-    
-    document.getElementById('stat-booked').innerText = res.stats.booked;
-    document.getElementById('stat-rev').innerText = res.stats.revenue.total.toLocaleString();
-    document.getElementById('stat-rev-paid').innerText = res.stats.revenue.paid.toLocaleString();
-    document.getElementById('stat-rev-unpaid').innerText = res.stats.revenue.unpaid.toLocaleString();
-
-    document.getElementById('input-win-top').value = res.winners.top;
-    document.getElementById('input-win-bot').value = res.winners.bot;
-    document.getElementById('input-time-close').value = res.times.close || "";
-    document.getElementById('input-time-draw').value = res.times.draw || "";
-    
-    const winnersSection = document.getElementById('admin-winners-section');
-    const winnersList = document.getElementById('admin-winners-list');
-    if (res.winnersList && res.winnersList.length > 0) {
-      winnersSection.classList.remove('hidden');
-      winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-warning py-2 mb-2 border-warning d-flex justify-content-between align-items-center bg-dark text-white"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-warning fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
-    } else if (res.winners.top || res.winners.bot) {
-       winnersSection.classList.remove('hidden'); 
-       winnersList.innerHTML = `<div class="lbl-bright small fw-bold mt-2">กองกลางเป็นผู้โชคดี เย้ๆ สนับสนุน 121</div>`;
-    } else winnersSection.classList.add('hidden');
-    
     globalAllUsers = res.allUsers;
-    const tbodyUsers = document.getElementById('all-users-table-body');
-    const badge = document.getElementById('pending-badge');
-    if(res.pendingUsers.length === 0) badge.classList.add('hidden'); else { badge.innerText = res.pendingUsers.length; badge.classList.remove('hidden'); }
-    if(res.allUsers.length === 0) tbodyUsers.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">ไม่มีข้อมูล</td></tr>`;
-    else {
-      tbodyUsers.innerHTML = res.allUsers.map(u => {
-        let statusBadge = u.status.toLowerCase() === 'approved' ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-secondary">Pending</span>';
-        let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
-        let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
-        
-        let btnClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-light' : 'btn-outline-dark';
-        let btnDelClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-danger' : 'btn-danger';
-        
-        actionBtns += `<button class="btn btn-sm ${btnClass} me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm ${btnDelClass} mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
-        
-        return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="time-bright fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${u.time}</small></td><td class="text-muted">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
-      }).join('');
+
+    if (updateUI) {
+      document.getElementById('stat-rem-up').innerText = res.stats.remTop;
+      document.getElementById('stat-rem-down').innerText = res.stats.remBot;
+      document.getElementById('stat-booked').innerText = res.stats.booked;
+      document.getElementById('stat-rev').innerText = res.stats.revenue.total.toLocaleString();
+      document.getElementById('stat-rev-paid').innerText = res.stats.revenue.paid.toLocaleString();
+      document.getElementById('stat-rev-unpaid').innerText = res.stats.revenue.unpaid.toLocaleString();
+
+      document.getElementById('input-win-top').value = res.winners.top;
+      document.getElementById('input-win-bot').value = res.winners.bot;
+      document.getElementById('input-time-close').value = res.times.close || "";
+      document.getElementById('input-time-draw').value = res.times.draw || "";
+      
+      const winnersSection = document.getElementById('admin-winners-section');
+      const winnersList = document.getElementById('admin-winners-list');
+      if (res.winnersList && res.winnersList.length > 0) {
+        winnersSection.classList.remove('hidden');
+        winnersList.innerHTML = res.winnersList.map(w => `<div class="alert alert-warning py-2 mb-2 border-warning d-flex justify-content-between align-items-center bg-dark text-white"><div><i class="bi bi-star-fill text-warning"></i> <b>${w.name}</b> <span class="badge bg-danger ms-2">${w.number}</span></div><div class="fw-bold text-warning fs-5">+${w.prize.toLocaleString()} ฿</div></div>`).join('');
+      } else if (res.winners.top || res.winners.bot) {
+         winnersSection.classList.remove('hidden'); 
+         winnersList.innerHTML = `<div class="lbl-bright small fw-bold mt-2 text-center text-success">กองกลางเป็นผู้โชคดี เย้ๆ สนับสนุน 121</div>`;
+      } else winnersSection.classList.add('hidden');
+      
+      const tbodyUsers = document.getElementById('all-users-table-body');
+      const badge = document.getElementById('pending-badge');
+      if(res.pendingUsers.length === 0) badge.classList.add('hidden'); else { badge.innerText = res.pendingUsers.length; badge.classList.remove('hidden'); }
+      if(res.allUsers.length === 0) tbodyUsers.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">ไม่มีข้อมูล</td></tr>`;
+      else {
+        tbodyUsers.innerHTML = res.allUsers.map(u => {
+          let statusBadge = u.status.toLowerCase() === 'approved' ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-secondary">Pending</span>';
+          let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
+          let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
+          
+          let btnClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-light' : 'btn-outline-dark';
+          let btnDelClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-danger' : 'btn-danger';
+          
+          actionBtns += `<button class="btn btn-sm ${btnClass} me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm ${btnDelClass} mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
+          
+          let uLocBadge = `<span class="badge bg-primary opacity-75">${u.location || 'ไม่ระบุ'}</span>`;
+          return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="time-bright fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${u.time}</small></td><td>${uLocBadge}</td><td class="text-muted">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
+        }).join('');
+      }
     }
 
-    const tbodyBooked = document.getElementById('booked-table-body');
-    if(res.bookedList.length === 0) tbodyBooked.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">ยังไม่มีการจอง</td></tr>`;
-    else {
-      const groupedData = {};
-      res.bookedList.forEach(b => {
-        const key = b.bookedBy + '_' + b.payType + '_' + b.time; 
-        if(!groupedData[key]) groupedData[key] = { name: b.bookedBy, payType: b.payType, time: b.time, topNums: [], botNums: [], totalPrice: 0 };
-        if(b.number.includes('(Up)')) groupedData[key].topNums.push(b.number.replace(' (Up)', '').trim());
-        else if(b.number.includes('(Down)')) groupedData[key].botNums.push(b.number.replace(' (Down)', '').trim());
-        groupedData[key].totalPrice += 100;
-      });
-      
-      globalBookedGroups = Object.values(groupedData); 
-      
-      tbodyBooked.innerHTML = globalBookedGroups.map(g => {
-        let numHtml = '';
-        if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        if(g.botNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
-        
-        let isPaid = (g.payType === 'ชำระ' || g.payType === 'เงินสด' || g.payType === 'ชำระแล้ว');
-        let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
-        let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='togglePayStatus("${g.name}", "${g.payType}", "${g.time}")'><i class="bi bi-arrow-repeat"></i></button>`;
+    const groupedData = {};
+    res.bookedList.forEach(b => {
+      const key = b.bookedBy + '_' + b.payType + '_' + b.time; 
+      if(!groupedData[key]) groupedData[key] = { name: b.bookedBy, payType: b.payType, time: b.time, topNums: [], botNums: [], totalPrice: 0 };
+      if(b.number.includes('(Up)')) groupedData[key].topNums.push(b.number.replace(' (Up)', '').trim());
+      else if(b.number.includes('(Down)')) groupedData[key].botNums.push(b.number.replace(' (Down)', '').trim());
+      groupedData[key].totalPrice += 100;
+    });
+    
+    globalBookedGroups = Object.values(groupedData); 
+    
+    if (updateUI) {
+        const tbodyBooked = document.getElementById('booked-table-body');
+        if(globalBookedGroups.length === 0) tbodyBooked.innerHTML = `<tr><td colspan="4" class="text-center text-muted py-3">ยังไม่มีการจอง</td></tr>`;
+        else {
+          tbodyBooked.innerHTML = globalBookedGroups.map(g => {
+            let numHtml = '';
+            if(g.topNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${g.topNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+            if(g.botNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${g.botNums.map(n => `<span class="badge bg-danger me-1">${n}</span>`).join('')}</div>`;
+            
+            let isPaid = (g.payType === 'ชำระ' || g.payType === 'เงินสด' || g.payType === 'ชำระแล้ว');
+            let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
+            let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='togglePayStatus("${g.name}", "${g.payType}", "${g.time}")'><i class="bi bi-arrow-repeat"></i></button>`;
 
-        return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="time-bright fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${payBadgeClass}">${g.payType}</span>${togglePayBtn}</td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
-      }).join('');
+            return `<tr><td class="ps-4 fw-bold">${g.name}<br><small class="time-bright fw-normal" style="font-size:0.75rem;"><i class="bi bi-clock"></i> ${g.time}</small></td><td>${numHtml}</td><td><span class="badge ${payBadgeClass}">${g.payType}</span>${togglePayBtn}</td><td class="text-end pe-4 text-warning fw-bold fs-5">${g.totalPrice.toLocaleString()}</td></tr>`;
+          }).join('');
+        }
     }
   }
 
-  // --- ดึงข้อมูลประวัติการเงินแบบแยกบรรทัด Up/Down ---
+  // --- ฟังก์ชันคำนวณส่วนแบ่งรายได้ตามพื้นที่ ---
+  function updateAllocationStats() {
+    const drawSelect = document.getElementById('allocation-draw-select');
+    
+    if(drawSelect.options.length <= 1 && globalHistoryData.length > 0) {
+        const uniqueDraws = [...new Set(globalHistoryData.map(h => h.drawDate))];
+        let options = '<option value="current">งวดปัจจุบัน (กระดานปัจจุบัน)</option>';
+        uniqueDraws.forEach(d => {
+            let display = d;
+            if(display.length > 20) { try { display = formatThaiDateTime(d); } catch(e) {} }
+            options += `<option value="${d}">${display}</option>`;
+        });
+        drawSelect.innerHTML = options;
+    }
+
+    const selected = drawSelect.value || 'current';
+    let totalSales = 0;
+    let totalPayouts = 0;
+
+    if (selected === 'current') {
+        totalSales = globalBookedGroups.reduce((sum, g) => sum + g.totalPrice, 0);
+        let winTop = document.getElementById('input-win-top').value;
+        let winBot = document.getElementById('input-win-bot').value;
+        if(winTop.length === 1) winTop = '0' + winTop;
+        if(winBot.length === 1) winBot = '0' + winBot;
+        
+        let winnersCount = 0;
+        globalBookedGroups.forEach(g => {
+            if (winTop && g.topNums.includes(winTop)) winnersCount++;
+            if (winBot && g.botNums.includes(winBot)) winnersCount++;
+        });
+        totalPayouts = winnersCount * 6000;
+    } else {
+        const histForDraw = globalHistoryData.filter(h => h.drawDate === selected);
+        totalSales = histForDraw.reduce((sum, h) => sum + h.amount, 0);
+        totalPayouts = 0; 
+    }
+
+    document.getElementById('allocation-total-sales').value = totalSales;
+    document.getElementById('allocation-payouts').value = totalPayouts;
+    updateAllocationNetProfit();
+  }
+
+  function updateAllocationNetProfit() {
+    const sales = parseFloat(document.getElementById('allocation-total-sales').value) || 0;
+    const payouts = parseFloat(document.getElementById('allocation-payouts').value) || 0;
+    // อ่านค่าเปอร์เซ็นต์สำรอง
+    const reservePct = parseFloat(document.getElementById('allocation-reserve-pct').value) || 0;
+    
+    let grossProfit = sales - payouts;
+    if (grossProfit < 0) grossProfit = 0; // ถ้าติดลบ ไม่ต้องหักสำรองต่อ
+    
+    const reserveAmount = grossProfit * (reservePct / 100);
+    const netProfit = grossProfit - reserveAmount;
+    
+    document.getElementById('allocation-net-profit').value = netProfit;
+    
+    const reserveDisplay = document.getElementById('reserve-amount-display');
+    if (reserveDisplay) {
+        reserveDisplay.innerText = `หักสำรองกองกลาง: ${reserveAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} บาท`;
+    }
+  }
+
+  function calculateAllocation() {
+    const selected = document.getElementById('allocation-draw-select').value || 'current';
+    const netProfit = parseFloat(document.getElementById('allocation-net-profit').value) || 0;
+    
+    const sales = parseFloat(document.getElementById('allocation-total-sales').value) || 0;
+    const payouts = parseFloat(document.getElementById('allocation-payouts').value) || 0;
+    const reservePct = parseFloat(document.getElementById('allocation-reserve-pct').value) || 0;
+    
+    let grossProfit = sales - payouts;
+    let reserveAmount = 0;
+    if(grossProfit > 0) reserveAmount = grossProfit * (reservePct / 100);
+
+    if (netProfit < 0) return Swal.fire('แจ้งเตือน', 'กำไรสุทธิติดลบ ไม่สามารถคำนวณส่วนแบ่งได้', 'warning');
+
+    let locationCounts = {};
+    let totalTickets = 0;
+
+    if (selected === 'current') {
+        globalBookedGroups.forEach(g => {
+            let user = globalAllUsers.find(u => u.name === g.name);
+            let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
+            let ticketsCount = g.topNums.length + g.botNums.length;
+            totalTickets += ticketsCount;
+            if(!locationCounts[loc]) locationCounts[loc] = 0;
+            locationCounts[loc] += ticketsCount;
+        });
+    } else {
+        const histForDraw = globalHistoryData.filter(h => h.drawDate === selected);
+        histForDraw.forEach(h => {
+            let user = globalAllUsers.find(u => u.name === h.name);
+            let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
+            let ticketsCount = 0;
+            if(h.numbers) { ticketsCount = h.numbers.split(',').filter(n => n.trim() !== '').length; }
+            totalTickets += ticketsCount;
+            if(!locationCounts[loc]) locationCounts[loc] = 0;
+            locationCounts[loc] += ticketsCount;
+        });
+    }
+
+    if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
+
+    // สร้างกล่องสรุปยอดแบบละเอียด
+    let html = `
+    <div class="alert alert-secondary border-secondary mb-4 shadow-sm" style="background-color: var(--card-bg);">
+        <h5 class="fw-bold mb-3" style="color: var(--text-color);"><i class="bi bi-receipt"></i> สรุปยอดเงินก่อนแบ่ง</h5>
+        <div class="d-flex justify-content-between mb-1"><span class="lbl-bright">กำไรหลังหักแจ็คพอต:</span> <strong>${grossProfit.toLocaleString()} บาท</strong></div>
+        <div class="d-flex justify-content-between mb-1"><span class="text-warning">หักเข้ากองกลางสำรอง (${reservePct}%):</span> <strong class="text-warning">${reserveAmount.toLocaleString()} บาท</strong></div>
+        <div class="d-flex justify-content-between mt-2 pt-2 border-top" style="border-color: var(--card-border) !important;">
+            <span class="text-primary fw-bold">ยอดที่จะนำมาแบ่งตามสัดส่วน:</span> 
+            <strong class="text-primary fs-5">${netProfit.toLocaleString()} บาท</strong>
+        </div>
+    </div>
+    <div class="row g-3">`;
+
+    for(let loc in locationCounts) {
+        let count = locationCounts[loc];
+        let percent = (count / totalTickets) * 100;
+        let share = (count / totalTickets) * netProfit;
+
+        html += `
+        <div class="col-12 col-md-6">
+            <div class="card p-3 shadow-sm border-start border-info border-4" style="background-color: var(--card-bg);">
+                <h5 class="text-info fw-bold mb-2"><i class="bi bi-geo-alt-fill"></i> ${loc}</h5>
+                <div class="d-flex justify-content-between text-muted small mb-1 lbl-bright">
+                    <span>ยอดขายรวม: <b>${count}</b> รายการ</span>
+                    <span>สัดส่วน: <b>${percent.toFixed(2)}%</b></span>
+                </div>
+                <h3 class="text-success mb-0 fw-bold mt-2 border-top pt-2" style="border-color: var(--card-border) !important;">
+                    ส่วนแบ่ง: ${share.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿
+                </h3>
+            </div>
+        </div>`;
+    }
+    html += `</div>`;
+    document.getElementById('allocation-results').innerHTML = html;
+  }
+
   async function loadHistoryData() {
     loader.classList.remove('hidden');
     const res = await apiCall('getHistoryData');
     loader.classList.add('hidden');
     if(!res || !res.success) return;
 
-    globalHistoryData = res.list; // เก็บข้อมูลดิบสำหรับ Export Excel
+    globalHistoryData = res.list; 
 
     let totalAll = res.totalPaid + res.totalUnpaid;
     document.getElementById('hist-total').innerText = totalAll.toLocaleString();
@@ -689,14 +892,12 @@
     }
   }
 
-  // --- ฟังก์ชันสำหรับส่งออกไฟล์ Excel ---
   function exportHistoryToExcel() {
     if (!globalHistoryData || globalHistoryData.length === 0) {
       Swal.fire('ไม่มีข้อมูล', 'ไม่มีข้อมูลประวัติสำหรับการส่งออก Excel', 'warning');
       return;
     }
     
-    // จัดรูปแบบข้อมูลสำหรับใส่ Excel
     const exportData = globalHistoryData.map(h => {
       let displayDate = h.drawDate;
       if(displayDate.length > 20) {
@@ -712,12 +913,9 @@
       };
     });
 
-    // สร้าง Workbook และ Worksheet ผ่าน SheetJS
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "History");
-
-    // บันทึกและดาวน์โหลดไฟล์
     XLSX.writeFile(wb, "GoldenLuck_History.xlsx");
   }
 
@@ -783,9 +981,18 @@
     if(!user) return;
     Swal.fire({
       title: 'แก้ไขข้อมูลผู้ใช้',
-      html: `<div class="swal-edit-form text-start"><label>ชื่อ</label><input id="edit-name" class="form-control mb-2" value="${user.name}"><label>Username</label><input id="edit-user" class="form-control mb-2" value="${user.username}"><label>รหัสใหม่</label><input id="edit-pass" type="password" class="form-control mb-2"><select id="edit-role" class="form-select mb-2"><option value="User" ${user.role==='User'?'selected':''}>User</option><option value="Admin" ${user.role==='Admin'?'selected':''}>Admin</option></select><select id="edit-status" class="form-select"><option value="Pending" ${user.status==='Pending'?'selected':''}>Pending</option><option value="Approved" ${user.status==='Approved'?'selected':''}>Approved</option></select></div>`,
+      html: `<div class="swal-edit-form text-start"><label>ชื่อ</label><input id="edit-name" class="form-control mb-2" value="${user.name}"><label>พื้นที่/สาขา</label><input id="edit-location" class="form-control mb-2" value="${user.location || ''}"><label>Username</label><input id="edit-user" class="form-control mb-2" value="${user.username}"><label>รหัสใหม่</label><input id="edit-pass" type="password" class="form-control mb-2"><select id="edit-role" class="form-select mb-2"><option value="User" ${user.role==='User'?'selected':''}>User</option><option value="Admin" ${user.role==='Admin'?'selected':''}>Admin</option></select><select id="edit-status" class="form-select"><option value="Pending" ${user.status==='Pending'?'selected':''}>Pending</option><option value="Approved" ${user.status==='Approved'?'selected':''}>Approved</option></select></div>`,
       showCancelButton: true, confirmButtonText: 'บันทึก',
-      preConfirm: () => { return { name: document.getElementById('edit-name').value, username: document.getElementById('edit-user').value, password: document.getElementById('edit-pass').value || user.password, role: document.getElementById('edit-role').value, status: document.getElementById('edit-status').value } }
+      preConfirm: () => { 
+        return { 
+          name: document.getElementById('edit-name').value, 
+          username: document.getElementById('edit-user').value, 
+          password: document.getElementById('edit-pass').value || user.password, 
+          location: document.getElementById('edit-location').value || 'ไม่ระบุ',
+          role: document.getElementById('edit-role').value, 
+          status: document.getElementById('edit-status').value 
+        } 
+      }
     }).then(r => { if(r.isConfirmed) adminAction('editUser', {oldUsername: username, newData: r.value}); });
   }
 
