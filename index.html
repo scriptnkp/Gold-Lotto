@@ -105,7 +105,6 @@
     
     .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .card-stats:hover { transform: translateY(-5px); }
-    
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
 
     .card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
@@ -118,7 +117,6 @@
 
     .theme-toggle-btn { cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
     .theme-toggle-btn:hover { background: var(--btn-hover-bg); }
-
     .lbl-bright { color: var(--text-label); }
     .time-bright { color: var(--text-label); }
   </style>
@@ -130,7 +128,6 @@
   <div class="mt-3 fw-bold text-primary" id="loader-text">กำลังซิงค์ข้อมูล...</div>
 </div>
 
-<!-- ================= หน้า Login / Register ================= -->
 <div id="auth-page" class="container" style="max-width: 400px; margin: 10vh auto;">
   <div class="d-flex justify-content-end mb-3">
     <button class="theme-toggle-btn shadow-sm" onclick="toggleTheme()" id="auth-theme-btn">
@@ -171,14 +168,12 @@
         <label class="form-label lbl-bright small mb-1">ตั้งรหัสผ่าน (Password)</label>
         <input type="password" id="r-pass" class="form-control" placeholder="อย่างน้อย 4 ตัวอักษร">
       </div>
-      
       <button class="btn btn-success w-100 fw-bold" onclick="register()">ยืนยันการลงทะเบียน</button>
       <div class="text-center mt-3 small lbl-bright"><a href="javascript:void(0);" class="text-success text-decoration-none fw-bold" id="link-back-login" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
     </div>
   </div>
 </div>
 
-<!-- ================= หน้า Admin Dashboard ================= -->
 <div id="admin-page" class="hidden">
   <nav class="navbar shadow-sm" style="background-color: var(--nav-bg); transition: background-color 0.3s; border-bottom: 2px solid #ffd700;">
     <div class="container-fluid">
@@ -193,7 +188,6 @@
 
   <div class="container mt-4 mb-5">
     
-    <!-- 1. หน้ากระดานปัจจุบัน -->
     <div id="admin-view-dashboard">
       <div class="card shadow-sm mb-4 border-top border-warning border-4">
         <div class="card-body">
@@ -275,7 +269,6 @@
       </div>
     </div>
     
-    <!-- 2. หน้าประวัติ & ยอดค้าง -->
     <div id="admin-view-history" class="hidden">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0 text-primary"><i class="bi bi-clock-history"></i> ประวัติการซื้อ & ติดตามยอดค้างชำระ (ย้อนหลัง)</h4>
@@ -313,7 +306,6 @@
       </div>
     </div>
 
-    <!-- 3. หน้าจัดการ User -->
     <div id="admin-view-users" class="hidden">
       <h4 class="mb-3 text-primary"><i class="bi bi-people-fill"></i> จัดการ User ทั้งหมด</h4>
       <div class="card shadow-sm border-0">
@@ -326,7 +318,6 @@
       </div>
     </div>
     
-    <!-- 4. หน้าคำนวณส่วนแบ่ง (เมนูใหม่ + เพิ่มหักเปอร์เซ็นต์สำรอง) -->
     <div id="admin-view-allocation" class="hidden">
         <h4 class="mb-3 text-info"><i class="bi bi-pie-chart-fill"></i> คำนวณส่วนแบ่งรายได้ (ตามพื้นที่)</h4>
         <div class="card shadow-sm border-0 mb-4 border-top border-info border-4">
@@ -348,7 +339,6 @@
                 
                 <div class="row g-3 mt-2 align-items-end border-top pt-3" style="border-color: var(--card-border) !important;">
                     <div class="col-md-4">
-                        <!-- ช่องใหม่ หักสำรอง % -->
                         <label class="form-label fw-bold text-warning">หักเข้ากองกลางสำรอง (%)</label>
                         <div class="input-group shadow-sm">
                             <input type="number" id="allocation-reserve-pct" class="form-control fw-bold text-warning" value="0" min="0" max="100" oninput="updateAllocationNetProfit()">
@@ -367,7 +357,6 @@
             </div>
         </div>
         
-        <!-- แสดงผลลัพธ์การคำนวณ -->
         <div id="allocation-results" class="mt-4"></div>
     </div>
 
@@ -388,7 +377,6 @@
   </div>
 </div>
 
-<!-- ================= หน้า User Dashboard ================= -->
 <div id="user-page" class="hidden">
   <nav class="navbar shadow-sm" id="user-navbar" style="background-color: var(--nav-user-bg); transition: background-color 0.3s;">
     <div class="container-fluid">
@@ -425,15 +413,13 @@
     <div>
       <span class="fw-bold fs-5" id="bar-text-main">เลือกแล้ว <span id="selected-count" class="text-warning">0</span> รายการ</span>
       <div class="mt-1">
-        <label class="me-3 pay-label"><input type="radio" name="payType" value="ไม่ชำระ" class="pay-radio" checked> 📝 ยังไม่ชำระ (เงินเซ็น)</label>
-        <label class="pay-label"><input type="radio" name="payType" value="ชำระ" class="pay-radio"> 💵 ชำระแล้ว (เงินสด)</label>
+        <label class="pay-label"><input type="radio" name="payType" value="ไม่ชำระ" class="pay-radio" checked> 📝 ลงบัญชีเงินเซ็น</label>
       </div>
     </div>
     <button class="btn btn-success fw-bold px-3 py-2 shadow" id="btn-confirm" onclick="confirmBooking()">ยืนยันคว้าโชค <i class="bi bi-check-circle"></i></button>
   </div>
 </div>
 
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   const loader = document.getElementById('loader');
@@ -698,7 +684,6 @@
     }
   }
 
-  // --- ฟังก์ชันคำนวณส่วนแบ่งรายได้ตามพื้นที่ ---
   function updateAllocationStats() {
     const drawSelect = document.getElementById('allocation-draw-select');
     
@@ -744,11 +729,10 @@
   function updateAllocationNetProfit() {
     const sales = parseFloat(document.getElementById('allocation-total-sales').value) || 0;
     const payouts = parseFloat(document.getElementById('allocation-payouts').value) || 0;
-    // อ่านค่าเปอร์เซ็นต์สำรอง
     const reservePct = parseFloat(document.getElementById('allocation-reserve-pct').value) || 0;
     
     let grossProfit = sales - payouts;
-    if (grossProfit < 0) grossProfit = 0; // ถ้าติดลบ ไม่ต้องหักสำรองต่อ
+    if (grossProfit < 0) grossProfit = 0; 
     
     const reserveAmount = grossProfit * (reservePct / 100);
     const netProfit = grossProfit - reserveAmount;
@@ -802,7 +786,6 @@
 
     if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
 
-    // สร้างกล่องสรุปยอดแบบละเอียด
     let html = `
     <div class="alert alert-secondary border-secondary mb-4 shadow-sm" style="background-color: var(--card-bg);">
         <h5 class="fw-bold mb-3" style="color: var(--text-color);"><i class="bi bi-receipt"></i> สรุปยอดเงินก่อนแบ่ง</h5>
@@ -838,6 +821,7 @@
     document.getElementById('allocation-results').innerHTML = html;
   }
 
+  // --- ดึงข้อมูลประวัติการเงิน ---
   async function loadHistoryData() {
     loader.classList.remove('hidden');
     const res = await apiCall('getHistoryData');
@@ -1096,6 +1080,7 @@
 
   function confirmBooking() {
     if(isSystemClosed) return;
+    // ดึงค่าการชำระเงินจาก radio (ซึ่งตอนนี้มีแต่ "ไม่ชำระ" แล้ว)
     const payType = document.querySelector('input[name="payType"]:checked').value;
     const totalPrice = selectedItems.length * 100;
     let topNums = []; let botNums = [];
@@ -1110,7 +1095,7 @@
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
-      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>ชำระแบบ: <b class="text-warning">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
+      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>รูปแบบ: <b class="text-warning">ลงบัญชีเงินเซ็น</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
       icon: 'info', showCancelButton: true, confirmButtonText: 'ยืนยันจอง!', confirmButtonColor: '#198754', cancelButtonText: 'ยกเลิก'
     }).then(async (r) => {
       if (r.isConfirmed) {
