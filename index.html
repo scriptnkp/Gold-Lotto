@@ -105,6 +105,7 @@
     
     .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .card-stats:hover { transform: translateY(-5px); }
+    
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
 
     .card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
@@ -117,6 +118,7 @@
 
     .theme-toggle-btn { cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
     .theme-toggle-btn:hover { background: var(--btn-hover-bg); }
+
     .lbl-bright { color: var(--text-label); }
     .time-bright { color: var(--text-label); }
   </style>
@@ -137,7 +139,7 @@
 
   <div class="card shadow-sm p-4" style="border-radius: 12px; border-top: 4px solid #ffd700 !important;">
     <div id="login-section">
-      <h3 class="text-center mb-4 text-primary" id="login-title"><b>เข้าสู่ระบบ ลุ้นโชค</b></h3>
+      <h3 class="text-center mb-4 text-primary" id="login-title"><b>ลุ้นโชค สนันสนุน 121</b></h3>
       <div class="mb-3 text-start">
         <label class="form-label lbl-bright small mb-1">ชื่อผู้ใช้งาน (Username)</label>
         <input type="text" id="l-user" class="form-control" placeholder="กรอก Username ของคุณ">
@@ -175,9 +177,9 @@
 </div>
 
 <div id="admin-page" class="hidden">
-  <nav class="navbar shadow-sm" style="background-color: var(--nav-bg); transition: background-color 0.3s; border-bottom: 2px solid #ffd700;">
+  <nav class="navbar navbar-dark shadow-sm" style="background-color: var(--nav-bg); transition: background-color 0.3s; border-bottom: 2px solid #ffd700;">
     <div class="container-fluid">
-      <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMenu"><span class="navbar-toggler-icon text-white"></span></button>
+      <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMenu"><span class="navbar-toggler-icon"></span></button>
       <span class="navbar-brand mb-0 h1 text-warning fw-bold">Admin Panel</span>
       <div>
          <button class="btn btn-sm btn-outline-light text-white me-2 border-0" onclick="toggleTheme()" id="admin-theme-btn" title="เปลี่ยนธีม"><i class="bi bi-moon-stars-fill fs-5"></i></button>
@@ -246,7 +248,6 @@
           </div>
         </div>
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="lbl-bright">โดนจองแล้วรวม</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
-        
         <div class="col-12 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-warning">
             <small class="lbl-bright">รายได้รวมงวดนี้ (บาท)</small>
@@ -382,7 +383,7 @@
 </div>
 
 <div id="user-page" class="hidden">
-  <nav class="navbar shadow-sm" id="user-navbar" style="background-color: var(--nav-user-bg); transition: background-color 0.3s;">
+  <nav class="navbar navbar-dark shadow-sm" id="user-navbar" style="background-color: var(--nav-user-bg); transition: background-color 0.3s;">
     <div class="container-fluid">
       <span class="navbar-brand mb-0 h4 fw-bold text-white" id="user-brand"><i class="bi bi-gem"></i> THE GOLDEN LUCK</span>
       <div>
@@ -691,7 +692,6 @@
     }
   }
 
-  // --- ดึงและแสดงข้อมูล History แบบแยกงวด ---
   async function loadHistoryData(preserveSelection = true) {
     const drawSelect = document.getElementById('history-draw-select');
     let currentSelection = preserveSelection && drawSelect ? drawSelect.value : null;
@@ -776,7 +776,6 @@
         if(downNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${downNums.join('')}</div>`;
         if(numHtml === '') numHtml = h.numbers; 
 
-        // ดักโชว์รางวัลแจ็คพอต
         let prizeHtml = (h.prize && h.prize > 0) ? `<div class="mt-1"><span class="badge bg-warning text-dark"><i class="bi bi-trophy-fill"></i> ถูกรางวัล ${h.prize.toLocaleString()} ฿</span></div>` : '';
 
         return `<tr>
@@ -829,7 +828,6 @@
     } else {
         const histForDraw = globalHistoryData.filter(h => h.drawDate === selected);
         totalSales = histForDraw.reduce((sum, h) => sum + h.amount, 0);
-        // ดึงยอดหักรางวัล (Prize) ของงวดนั้นๆ จาก History
         totalPayouts = histForDraw.reduce((sum, h) => sum + (h.prize || 0), 0);
     }
 
@@ -898,10 +896,11 @@
 
     if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
 
+    // แก้ไขสีตัวหนังสือตรงที่วงในภาพ (grossProfit) ให้เป็น var(--text-color) เพื่อให้อ่านง่ายทั้ง 2 โหมด
     let html = `
     <div class="alert alert-secondary border-secondary mb-4 shadow-sm" style="background-color: var(--card-bg);">
         <h5 class="fw-bold mb-3" style="color: var(--text-color);"><i class="bi bi-receipt"></i> สรุปยอดเงินก่อนแบ่ง</h5>
-        <div class="d-flex justify-content-between mb-1"><span class="lbl-bright">กำไรหลังหักแจ็คพอต:</span> <strong>${grossProfit.toLocaleString()} บาท</strong></div>
+        <div class="d-flex justify-content-between mb-1"><span class="lbl-bright">กำไรหลังหักแจ็คพอต:</span> <strong style="color: var(--text-color);">${grossProfit.toLocaleString()} บาท</strong></div>
         <div class="d-flex justify-content-between mb-1"><span class="text-warning">หักเข้ากองกลางสำรอง (${reservePct}%):</span> <strong class="text-warning">${reserveAmount.toLocaleString()} บาท</strong></div>
         <div class="d-flex justify-content-between mt-2 pt-2 border-top" style="border-color: var(--card-border) !important;">
             <span class="text-primary fw-bold">ยอดที่จะนำมาแบ่งตามสัดส่วน:</span> 
