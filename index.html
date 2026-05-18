@@ -38,6 +38,7 @@
       --alert-bg: #cff4fc; 
       --alert-border: #b6effb;
       --table-text: #212529;
+      --swal-bg: #ffffff; 
     }
 
     /* =========================================
@@ -62,7 +63,12 @@
       --alert-bg: #1a2235; 
       --alert-border: #ffd700;
       --table-text: #f8f9fa;
+      --swal-bg: #1a2235; 
     }
+
+    .swal2-popup { background-color: var(--swal-bg) !important; color: var(--text-color) !important; }
+    .swal2-title { color: var(--text-color) !important; }
+    .swal2-html-container { color: var(--text-color) !important; }
 
     .text-muted { color: var(--text-muted) !important; }
     body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Sarabun', sans-serif; padding-bottom: 90px; transition: background-color 0.3s, color 0.3s; }
@@ -121,6 +127,12 @@
 
     .lbl-bright { color: var(--text-label); }
     .time-bright { color: var(--text-label); }
+
+    /* --- คลาสสำหรับปุ่ม แก้ไข และ ลบ เพื่อให้เปลี่ยนสีตามโหมดอัตโนมัติ --- */
+    .btn-edit { color: var(--text-color); border: 1px solid var(--text-color); background: transparent; transition: 0.3s; }
+    .btn-edit:hover { background: var(--text-color); color: var(--bg-color); }
+    .btn-del { color: #dc3545; border: 1px solid #dc3545; background: transparent; transition: 0.3s; }
+    .btn-del:hover { background: #dc3545; color: #fff; }
   </style>
 </head>
 <body>
@@ -139,7 +151,7 @@
 
   <div class="card shadow-sm p-4" style="border-radius: 12px; border-top: 4px solid #ffd700 !important;">
     <div id="login-section">
-      <h3 class="text-center mb-4 text-primary" id="login-title"><b>ลุ้นโชค สนับสนุน 121</b></h3>
+      <h3 class="text-center mb-4 text-primary" id="login-title"><b>เข้าสู่ระบบ ลุ้นโชค</b></h3>
       <div class="mb-3 text-start">
         <label class="form-label lbl-bright small mb-1">ชื่อผู้ใช้งาน (Username)</label>
         <input type="text" id="l-user" class="form-control" placeholder="กรอก Username ของคุณ">
@@ -248,6 +260,7 @@
           </div>
         </div>
         <div class="col-6 col-md-4"><div class="card p-3 shadow-sm card-stats border-danger"><small class="lbl-bright">โดนจองแล้วรวม</small><h3 id="stat-booked" class="mb-0 text-danger">-</h3></div></div>
+        
         <div class="col-12 col-md-4">
           <div class="card p-3 shadow-sm card-stats border-warning">
             <small class="lbl-bright">รายได้รวมงวดนี้ (บาท)</small>
@@ -651,10 +664,8 @@
           let roleBadge = u.role.toLowerCase() === 'admin' ? '<span class="badge bg-warning text-dark">Admin</span>' : '<span class="badge bg-info text-dark">User</span>';
           let actionBtns = u.status.toLowerCase() === 'pending' ? `<button class="btn btn-sm btn-success me-1 mb-1" onclick="approve('${u.username}')"><i class="bi bi-check-lg"></i></button>` : '';
           
-          let btnClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-light' : 'btn-outline-dark';
-          let btnDelClass = document.documentElement.getAttribute('data-theme') === 'dark' ? 'btn-outline-danger' : 'btn-danger';
-          
-          actionBtns += `<button class="btn btn-sm ${btnClass} me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm ${btnDelClass} mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
+          // ใช้คลาสปุ่มใหม่
+          actionBtns += `<button class="btn btn-sm btn-edit me-1 mb-1" onclick="openEditUser('${u.username}')"><i class="bi bi-pencil-square"></i></button><button class="btn btn-sm btn-del mb-1" onclick="deleteUserBtn('${u.username}')"><i class="bi bi-trash"></i></button>`;
           
           let uLocBadge = `<span class="badge bg-primary opacity-75">${u.location || 'ไม่ระบุ'}</span>`;
           return `<tr><td class="ps-4 fw-bold">${u.name}<br><small class="time-bright fw-normal" style="font-size:0.7rem;"><i class="bi bi-clock"></i> ${u.time}</small></td><td>${uLocBadge}</td><td class="text-muted">@${u.username}</td><td>${roleBadge} ${statusBadge}</td><td class="text-end pe-4">${actionBtns}</td></tr>`;
@@ -874,7 +885,7 @@
 
     if (selected === 'current') {
         globalBookedGroups.forEach(g => {
-            let user = globalAllUsers.find(u => u.name === g.name);
+            let user = globalAllUsers.find(u => String(u.name) === String(g.name));
             let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
             let ticketsCount = g.topNums.length + g.botNums.length;
             totalTickets += ticketsCount;
@@ -884,7 +895,7 @@
     } else {
         const histForDraw = globalHistoryData.filter(h => h.drawDate === selected);
         histForDraw.forEach(h => {
-            let user = globalAllUsers.find(u => u.name === h.name);
+            let user = globalAllUsers.find(u => String(u.name) === String(h.name));
             let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
             let ticketsCount = 0;
             if(h.numbers) { ticketsCount = h.numbers.split(',').filter(n => n.trim() !== '').length; }
@@ -896,7 +907,6 @@
 
     if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
 
-    // แก้ไขสีตัวหนังสือตรงที่วงในภาพ (grossProfit) ให้เป็น var(--text-color) เพื่อให้อ่านง่ายทั้ง 2 โหมด
     let html = `
     <div class="alert alert-secondary border-secondary mb-4 shadow-sm" style="background-color: var(--card-bg);">
         <h5 class="fw-bold mb-3" style="color: var(--text-color);"><i class="bi bi-receipt"></i> สรุปยอดเงินก่อนแบ่ง</h5>
@@ -987,7 +997,7 @@
   }
 
   function togglePayStatus(name, currentPayType, time) {
-    const group = globalBookedGroups.find(g => g.name === name && g.payType === currentPayType && g.time === time);
+    const group = globalBookedGroups.find(g => String(g.name) === String(name) && g.payType === currentPayType && g.time === time);
     if(!group) return;
 
     Swal.fire({
@@ -1017,8 +1027,14 @@
 
   function adminSaveTimes() { adminAction('setTimes', { closeTime: document.getElementById('input-time-close').value, drawTime: document.getElementById('input-time-draw').value }); }
   function adminSaveWinners() { adminAction('setWinningNumbers', { top: document.getElementById('input-win-top').value, bot: document.getElementById('input-win-bot').value }); }
-  function approve(username) { adminAction('approveUser', { username: username }); }
-  function deleteUserBtn(username) { Swal.fire({ title: 'ลบผู้ใช้?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ', confirmButtonColor: '#d33' }).then(r => { if(r.isConfirmed) adminAction('deleteUser', {username: username}); }); }
+  
+  function approve(username) { adminAction('approveUser', { username: String(username) }); }
+  
+  function deleteUserBtn(username) { 
+      Swal.fire({ title: 'ลบผู้ใช้?', icon: 'warning', showCancelButton: true, confirmButtonText: 'ลบ', confirmButtonColor: '#d33' }).then(r => { 
+          if(r.isConfirmed) adminAction('deleteUser', {username: String(username)}); 
+      }); 
+  }
   
   function adminResetBoard() {
     Swal.fire({ title: 'ยืนยันล้างกระดาน?', text: "ข้อมูลเดิมจะถูกย้ายไปเก็บที่ 'ประวัติการซื้อ' และกระดานจะเริ่มงวดใหม่", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'ล้างข้อมูล'
@@ -1026,7 +1042,7 @@
   }
 
   function openEditUser(username) {
-    const user = globalAllUsers.find(u => u.username === username);
+    const user = globalAllUsers.find(u => String(u.username) === String(username));
     if(!user) return;
     Swal.fire({
       title: 'แก้ไขข้อมูลผู้ใช้',
@@ -1042,7 +1058,7 @@
           status: document.getElementById('edit-status').value 
         } 
       }
-    }).then(r => { if(r.isConfirmed) adminAction('editUser', {oldUsername: username, newData: r.value}); });
+    }).then(r => { if(r.isConfirmed) adminAction('editUser', {oldUsername: String(username), newData: r.value}); });
   }
 
   function openUserProfile() {
@@ -1074,7 +1090,7 @@
         if (!newData.name) return Swal.fire('ผิดพลาด', 'กรุณากรอกชื่อ-นามสกุล', 'error');
         
         loader.classList.remove('hidden');
-        const res = await apiCall('updateUserProfile', { username: currentUsername, newData: newData });
+        const res = await apiCall('updateUserProfile', { username: String(currentUsername), newData: newData });
         loader.classList.add('hidden');
         
         if (res.success) {
@@ -1134,11 +1150,11 @@
       let topBadge = ''; let botBadge = '';
       if(data.winners.top && item.number === data.winners.top) {
         topBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
-        if(isTopBooked && item.top.user === currentFullName) { myWinnings.push(`Up ${item.number}`); totalPrize += 6000; }
+        if(isTopBooked && String(item.top.user) === String(currentFullName)) { myWinnings.push(`Up ${item.number}`); totalPrize += 6000; }
       }
       if(data.winners.bot && item.number === data.winners.bot) {
         botBadge = '<div class="winner-badge">🏆 JACKPOT</div>';
-        if(isBotBooked && item.bottom.user === currentFullName) { myWinnings.push(`Down ${item.number}`); totalPrize += 6000; }
+        if(isBotBooked && String(item.bottom.user) === String(currentFullName)) { myWinnings.push(`Down ${item.number}`); totalPrize += 6000; }
       }
       
       grid.innerHTML += `
