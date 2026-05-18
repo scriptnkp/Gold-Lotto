@@ -105,7 +105,6 @@
     
     .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
     .card-stats:hover { transform: translateY(-5px); }
-    
     .jackpot-banner { background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; text-align: center; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; }
 
     .card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
@@ -118,7 +117,6 @@
 
     .theme-toggle-btn { cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; gap: 5px; transition: 0.3s; }
     .theme-toggle-btn:hover { background: var(--btn-hover-bg); }
-
     .lbl-bright { color: var(--text-label); }
     .time-bright { color: var(--text-label); }
   </style>
@@ -148,7 +146,6 @@
         <label class="form-label lbl-bright small mb-1">รหัสผ่าน (Password)</label>
         <input type="password" id="l-pass" class="form-control" placeholder="กรอกรหัสผ่าน">
       </div>
-      
       <button class="btn btn-primary w-100 fw-bold" id="btn-login" onclick="login()">เข้าสู่ระบบ</button>
       <div class="text-center mt-3 small lbl-bright">ยังไม่มีบัญชี? <a href="javascript:void(0);" class="text-primary text-decoration-none fw-bold" id="link-register" onclick="toggleAuth(false)">สมัครสมาชิกใหม่</a></div>
     </div>
@@ -171,7 +168,6 @@
         <label class="form-label lbl-bright small mb-1">ตั้งรหัสผ่าน (Password)</label>
         <input type="password" id="r-pass" class="form-control" placeholder="อย่างน้อย 4 ตัวอักษร">
       </div>
-      
       <button class="btn btn-success w-100 fw-bold" onclick="register()">ยืนยันการลงทะเบียน</button>
       <div class="text-center mt-3 small lbl-bright"><a href="javascript:void(0);" class="text-success text-decoration-none fw-bold" id="link-back-login" onclick="toggleAuth(true)">กลับไปหน้าเข้าสู่ระบบ</a></div>
     </div>
@@ -551,7 +547,7 @@
       } else {
         currentUsername = res.username; 
         currentFullName = res.name;
-        currentLocation = res.location || "ไม่ระบุ"; // เก็บ Location ไว้
+        currentLocation = res.location || "ไม่ระบุ"; 
         loadUserPage(true); 
       }
     } else Swal.fire('ผิดพลาด', res.message, 'error');
@@ -602,7 +598,7 @@
     else if(view === 'history') {
       document.getElementById('admin-view-history').classList.remove('hidden');
       document.getElementById('menu-history').classList.add('active'); 
-      loadHistoryData(); 
+      loadHistoryData(true); 
     }
     else if(view === 'allocation') {
       document.getElementById('admin-view-allocation').classList.remove('hidden');
@@ -695,6 +691,7 @@
     }
   }
 
+  // --- ดึงและแสดงข้อมูล History แบบแยกงวด ---
   async function loadHistoryData(preserveSelection = true) {
     const drawSelect = document.getElementById('history-draw-select');
     let currentSelection = preserveSelection && drawSelect ? drawSelect.value : null;
@@ -709,18 +706,20 @@
     const uniqueDraws = [...new Set(globalHistoryData.map(h => h.drawDate))];
     
     if(uniqueDraws.length === 0) {
-        drawSelect.innerHTML = '<option value="">ไม่มีข้อมูล</option>';
+        if(drawSelect) drawSelect.innerHTML = '<option value="">ไม่มีข้อมูล</option>';
     } else {
-        drawSelect.innerHTML = uniqueDraws.map(d => {
-            let display = d;
-            if(display.length > 20) { try { display = formatThaiDateTime(d); } catch(e) {} }
-            return `<option value="${d}">${display}</option>`;
-        }).join('');
-        
-        if(currentSelection && uniqueDraws.includes(currentSelection)) {
-            drawSelect.value = currentSelection;
-        } else {
-            drawSelect.selectedIndex = 0; 
+        if(drawSelect) {
+            drawSelect.innerHTML = uniqueDraws.map(d => {
+                let display = d;
+                if(display.length > 20) { try { display = formatThaiDateTime(d); } catch(e) {} }
+                return `<option value="${d}">${display}</option>`;
+            }).join('');
+            
+            if(currentSelection && uniqueDraws.includes(currentSelection)) {
+                drawSelect.value = currentSelection;
+            } else {
+                drawSelect.selectedIndex = 0; 
+            }
         }
     }
     
@@ -728,7 +727,9 @@
   }
 
   function updateHistoryView() {
-    const selected = document.getElementById('history-draw-select').value;
+    const drawSelect = document.getElementById('history-draw-select');
+    if (!drawSelect) return;
+    const selected = drawSelect.value;
     let filteredData = globalHistoryData;
     if(selected) {
         filteredData = globalHistoryData.filter(h => h.drawDate === selected);
@@ -739,49 +740,54 @@
 
     const tbody = document.getElementById('history-table-body');
     if(filteredData.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">ยังไม่มีประวัติการจองในงวดนี้</td></tr>`;
+      if(tbody) tbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">ยังไม่มีประวัติการจองในงวดนี้</td></tr>`;
       document.getElementById('hist-total').innerText = '0';
       document.getElementById('hist-paid').innerText = '0';
       document.getElementById('hist-unpaid').innerText = '0';
       return;
     } 
 
-    tbody.innerHTML = filteredData.map(h => {
-      let isPaid = (h.status === 'ชำระ' || h.status === 'เงินสด' || h.status === 'ชำระแล้ว');
-      if (isPaid) totalPaid += h.amount; else totalUnpaid += h.amount;
+    if(tbody) {
+      tbody.innerHTML = filteredData.map(h => {
+        let isPaid = (h.status === 'ชำระ' || h.status === 'เงินสด' || h.status === 'ชำระแล้ว');
+        if (isPaid) totalPaid += h.amount; else totalUnpaid += h.amount;
 
-      let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
-      let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='toggleHistPay(${h.row}, "${h.status}")'><i class="bi bi-arrow-repeat"></i></button>`;
-      
-      let displayDrawDate = h.drawDate;
-      if(displayDrawDate.length > 20) {
-        try { displayDrawDate = formatThaiDateTime(h.drawDate); } catch(e) {}
-      }
+        let payBadgeClass = isPaid ? 'bg-success' : 'bg-danger';
+        let togglePayBtn = `<button class="btn btn-sm btn-outline-warning ms-2 py-0 px-1" title="เปลี่ยนสถานะ" onclick='toggleHistPay(${h.row}, "${h.status}")'><i class="bi bi-arrow-repeat"></i></button>`;
+        
+        let displayDrawDate = h.drawDate;
+        if(displayDrawDate.length > 20) {
+          try { displayDrawDate = formatThaiDateTime(h.drawDate); } catch(e) {}
+        }
 
-      let upNums = [];
-      let downNums = [];
-      if(h.numbers) {
-        h.numbers.split(',').forEach(n => {
-          let numStr = n.trim();
-          if(numStr.includes('(Up)')) upNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Up)', '').trim()}</span>`);
-          else if(numStr.includes('(Down)')) downNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Down)', '').trim()}</span>`);
-          else if(numStr !== '') upNums.push(`<span class="badge bg-secondary me-1">${numStr}</span>`);
-        });
-      }
-      
-      let numHtml = '';
-      if(upNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${upNums.join('')}</div>`;
-      if(downNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${downNums.join('')}</div>`;
-      if(numHtml === '') numHtml = h.numbers; 
+        let upNums = [];
+        let downNums = [];
+        if(h.numbers) {
+          h.numbers.split(',').forEach(n => {
+            let numStr = n.trim();
+            if(numStr.includes('(Up)')) upNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Up)', '').trim()}</span>`);
+            else if(numStr.includes('(Down)')) downNums.push(`<span class="badge bg-danger me-1">${numStr.replace('(Down)', '').trim()}</span>`);
+            else if(numStr !== '') upNums.push(`<span class="badge bg-secondary me-1">${numStr}</span>`);
+          });
+        }
+        
+        let numHtml = '';
+        if(upNums.length > 0) numHtml += `<div class="mb-1"><span class="lbl-bright small fw-bold me-1">Up:</span> ${upNums.join('')}</div>`;
+        if(downNums.length > 0) numHtml += `<div><span class="lbl-bright small fw-bold me-1">Down:</span> ${downNums.join('')}</div>`;
+        if(numHtml === '') numHtml = h.numbers; 
 
-      return `<tr>
-        <td class="ps-4 text-muted small fw-bold">${displayDrawDate}<br><span style="font-size:0.65rem;" class="time-bright fw-normal"><i class="bi bi-clock"></i> ${h.timestamp}</span></td>
-        <td class="fw-bold">${h.name}</td>
-        <td class="small time-bright" style="white-space: normal; min-width: 150px;">${numHtml}</td>
-        <td class="text-end text-warning fw-bold">${h.amount.toLocaleString()}</td>
-        <td class="pe-4 ps-4"><span class="badge ${payBadgeClass}">${h.status}</span>${togglePayBtn}</td>
-      </tr>`;
-    }).join('');
+        // ดักโชว์รางวัลแจ็คพอต
+        let prizeHtml = (h.prize && h.prize > 0) ? `<div class="mt-1"><span class="badge bg-warning text-dark"><i class="bi bi-trophy-fill"></i> ถูกรางวัล ${h.prize.toLocaleString()} ฿</span></div>` : '';
+
+        return `<tr>
+          <td class="ps-4 text-muted small fw-bold">${displayDrawDate}<br><span style="font-size:0.65rem;" class="time-bright fw-normal"><i class="bi bi-clock"></i> ${h.timestamp}</span></td>
+          <td class="fw-bold">${h.name}${prizeHtml}</td>
+          <td class="small time-bright" style="white-space: normal; min-width: 150px;">${numHtml}</td>
+          <td class="text-end text-warning fw-bold">${h.amount.toLocaleString()}</td>
+          <td class="pe-4 ps-4"><span class="badge ${payBadgeClass}">${h.status}</span>${togglePayBtn}</td>
+        </tr>`;
+      }).join('');
+    }
 
     let totalAll = totalPaid + totalUnpaid;
     document.getElementById('hist-total').innerText = totalAll.toLocaleString();
@@ -823,7 +829,8 @@
     } else {
         const histForDraw = globalHistoryData.filter(h => h.drawDate === selected);
         totalSales = histForDraw.reduce((sum, h) => sum + h.amount, 0);
-        totalPayouts = 0; 
+        // ดึงยอดหักรางวัล (Prize) ของงวดนั้นๆ จาก History
+        totalPayouts = histForDraw.reduce((sum, h) => sum + (h.prize || 0), 0);
     }
 
     document.getElementById('allocation-total-sales').value = totalSales;
@@ -927,7 +934,9 @@
   }
 
   function exportHistoryToExcel() {
-    const selected = document.getElementById('history-draw-select').value;
+    const drawSelect = document.getElementById('history-draw-select');
+    if (!drawSelect) return;
+    const selected = drawSelect.value;
     let filteredData = globalHistoryData;
     if(selected) {
         filteredData = globalHistoryData.filter(h => h.drawDate === selected);
@@ -949,7 +958,8 @@
         "ชื่อผู้จอง": h.name,
         "รายการเบอร์": h.numbers,
         "ยอดเงิน (บาท)": h.amount,
-        "สถานะชำระ": h.status
+        "สถานะชำระ": h.status,
+        "เงินรางวัล (บาท)": h.prize || 0
       };
     });
 
@@ -1036,7 +1046,6 @@
     }).then(r => { if(r.isConfirmed) adminAction('editUser', {oldUsername: username, newData: r.value}); });
   }
 
-  // --- ฟังก์ชันแก้ไขโปรไฟล์ของ User เอง ---
   function openUserProfile() {
     Swal.fire({
       title: 'แก้ไขโปรไฟล์ส่วนตัว',
@@ -1196,7 +1205,7 @@
 
     Swal.fire({
       title: 'ยืนยันคว้าโชค',
-      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>ชำระแบบ: <b class="text-warning">${payType}</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
+      html: `<div class="text-start ${boxClass} p-3 rounded mb-3 border">${dHtml}</div>รูปแบบ: <b class="text-warning">ลงบัญชีเงินเซ็น</b><br><h3 class="mt-3 text-success">ยอดรวม: ${totalPrice.toLocaleString()} ฿</h3>`,
       icon: 'info', showCancelButton: true, confirmButtonText: 'ยืนยันจอง!', confirmButtonColor: '#198754', cancelButtonText: 'ยกเลิก'
     }).then(async (r) => {
       if (r.isConfirmed) {
