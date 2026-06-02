@@ -98,10 +98,11 @@ app.user = {
         if(isBotBooked && String(item.bottom.user) === String(app.global.currentFullName)) { myWinnings.push(`Down ${item.number}`); totalPrize += 6000; }
       }
       
+      // เพิ่ม event onclick ให้ .num-header เพื่อเลือกทั้งคู่
       grid.innerHTML += `
         <div class="col-4 col-sm-3 col-md-2">
           <div class="num-card">
-            <div class="num-header">${item.number}</div>
+            <div class="num-header" onclick="app.user.toggleBoth('${item.number}', ${isTopBooked}, ${isBotBooked})" title="เลือกทั้ง Up และ Down">${item.number}</div>
             <div class="d-flex position-relative">
               <div id="btn-${item.number}-Top" class="num-btn top-btn position-relative ${topClass}" onclick="app.user.toggleSelection('${item.number}', 'Top', ${isTopBooked})">
                 ${topBadge}<b>Up</b><br><span class="booked-name" title="${topText}">${topText}</span>
@@ -127,6 +128,30 @@ app.user = {
         icon: 'success', confirmButtonText: 'สุดยอด!', confirmButtonColor: '#ffd700', color: '#000', background: '#fff'
       });
     } else if (isFirstLogin) Swal.fire({ title: 'เข้าสู่ระบบสำเร็จ', text: 'ยินดีต้อนรับคุณ ' + app.global.currentFullName, icon: 'success', timer: 1000, showConfirmButton: false });
+  },
+
+  // --- ฟังก์ชันใหม่: กดตัวเลขเพื่อเลือกเหมาทั้ง Up และ Down ---
+  toggleBoth: function(num, isTopBooked, isBotBooked) {
+    if(app.global.isSystemClosed) return Swal.fire('ปิดรับจอง', 'หมดเวลาแล้วครับ', 'warning');
+    
+    const keyTop = num + '_Top';
+    const keyBot = num + '_Bottom';
+    const hasTop = app.global.selectedItems.includes(keyTop);
+    const hasBot = app.global.selectedItems.includes(keyBot);
+
+    // ถ้าโดนจองไปแล้วทั้งคู่ กดไปก็ไม่มีผล
+    if (isTopBooked && isBotBooked) return;
+
+    // ถ้าเลือกไว้ทั้งคู่แล้ว -> กดเพื่อเอาออกทั้งคู่
+    if (hasTop && hasBot) {
+        this.toggleSelection(num, 'Top', isTopBooked);
+        this.toggleSelection(num, 'Bottom', isBotBooked);
+    } 
+    // ถ้ายังไม่ได้เลือก หรือเลือกแค่อันเดียว -> กดเพื่อเหมาให้ครบทั้ง 2 อัน (เว้นอันที่ถูกคนอื่นจองไปแล้ว)
+    else {
+        if (!hasTop && !isTopBooked) this.toggleSelection(num, 'Top', isTopBooked);
+        if (!hasBot && !isBotBooked) this.toggleSelection(num, 'Bottom', isBotBooked);
+    }
   },
 
   toggleSelection: function(num, type, isBooked) {
