@@ -1,0 +1,177 @@
+/* =========================================
+   Base & Light Theme (Default)
+========================================= */
+:root {
+  --bg-color: #f4f7f6;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+  --header-bg: #f8f9fa;
+  --header-text: #343a40;
+  --btn-hover-bg: #e9ecef;
+  --text-muted: #6c757d; 
+  --text-label: #6c757d;
+  --nav-bg: #212529; 
+  --nav-user-bg: #0d6efd; 
+  --bar-bg: #ffffff;
+  --bar-text: #212529;
+  --input-bg: #ffffff;
+  --input-text: #212529;
+  --alert-bg: #cff4fc; 
+  --alert-border: #b6effb;
+  --table-text: #212529;
+  --swal-bg: #ffffff; 
+}
+
+/* =========================================
+   Dark Theme Variables
+========================================= */
+[data-theme="dark"] {
+  --bg-color: #0b0f19;
+  --text-color: #f8f9fa;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: #444;
+  --header-bg: rgba(0, 0, 0, 0.4);
+  --header-text: #ffd700;
+  --btn-hover-bg: rgba(255, 215, 0, 0.2);
+  --text-muted: #cbd5e1; 
+  --text-label: #e2e8f0; 
+  --nav-bg: #050810;
+  --nav-user-bg: #050810; 
+  --bar-bg: rgba(10, 15, 25, 0.95);
+  --bar-text: #ffffff;
+  --input-bg: #1a2235;
+  --input-text: #ffffff;
+  --alert-bg: #1a2235; 
+  --alert-border: #ffd700;
+  --table-text: #f8f9fa;
+  --swal-bg: #1a2235; 
+}
+
+/* =========================================
+   Global & Utility Classes
+========================================= */
+body { 
+  background-color: var(--bg-color); 
+  color: var(--text-color); 
+  font-family: 'Sarabun', sans-serif; 
+  padding-bottom: 90px; 
+  transition: background-color 0.3s, color 0.3s; 
+}
+.hidden { display: none !important; }
+.text-muted { color: var(--text-muted) !important; }
+.lbl-bright { color: var(--text-label); }
+.time-bright { color: var(--text-label); }
+
+#loader { 
+  position: fixed; top:0; left:0; width:100%; height:100%; 
+  background: var(--bg-color); opacity: 0.95; z-index:9999; 
+  display:flex; flex-direction: column; justify-content:center; 
+  align-items:center; transition: background-color 0.3s; 
+}
+
+/* =========================================
+   SweetAlert2 Customization
+========================================= */
+.swal2-popup { background-color: var(--swal-bg) !important; color: var(--text-color) !important; }
+.swal2-title { color: var(--text-color) !important; }
+.swal2-html-container { color: var(--text-color) !important; }
+.swal-edit-form { text-align: left; }
+.swal-edit-form label { font-size: 0.85rem; color: var(--text-label); margin-bottom: 2px; margin-top: 10px; display: block; }
+
+/* =========================================
+   Card Number Grid (กระดานเบอร์)
+========================================= */
+.num-card { 
+  border: 1px solid var(--card-border); border-radius: 8px; 
+  background: var(--card-bg); overflow: hidden; text-align: center; 
+  position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+  transition: 0.2s; backdrop-filter: blur(5px); 
+}
+.num-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.num-header { 
+  font-size: 1.8rem; font-weight: 900; padding: 10px 0; 
+  background: var(--header-bg); color: var(--header-text); 
+  border-bottom: 1px solid var(--card-border); 
+  transition: background-color 0.3s, color 0.3s; 
+}
+.num-btn { 
+  width: 50%; padding: 8px 0; font-size: 0.9rem; cursor: pointer; 
+  transition: 0.2s; background: transparent; color: var(--text-color); 
+  border-top: 1px solid var(--card-border); 
+}
+.num-btn.top-btn { border-right: 1px solid var(--card-border); }
+.num-btn:hover:not(.booked) { background: var(--btn-hover-bg); }
+
+/* Booking Statuses */
+.num-btn.selected { background: #198754 !important; color: white !important; font-weight: bold; border-color: #198754; }
+[data-theme="dark"] .num-btn.selected { background: linear-gradient(45deg, #198754, #20c997) !important; border-color: #20c997; }
+.num-btn.booked { background: #dc3545; color: #fff !important; cursor: not-allowed; opacity: 0.9; border-color: #dc3545; }
+[data-theme="dark"] .num-btn.booked { background: #8b0000; opacity: 0.7; }
+
+/* Jackpot & Names */
+.winner-badge { 
+  position: absolute; top: -5px; right: -5px; background: #ffc107; color: #000; 
+  font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; 
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); transform: rotate(15deg); 
+  z-index: 10; animation: pulse 1.5s infinite; 
+}
+@keyframes pulse { 0% { transform: scale(1) rotate(15deg); } 50% { transform: scale(1.1) rotate(15deg); } 100% { transform: scale(1) rotate(15deg); } }
+
+.booked-name { font-size: 0.65rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: var(--text-muted); }
+.num-btn.booked .booked-name { color: #ffffff !important; text-decoration: line-through; }
+.num-btn.selected .booked-name { color: #ffffff !important; }
+
+/* =========================================
+   UI Components (Bar, Nav, Banner)
+========================================= */
+.booking-bar { 
+  position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bar-bg); 
+  color: var(--bar-text); padding: 10px 20px; z-index: 1000; 
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: 0.3s; 
+}
+[data-theme="dark"] .booking-bar { border-top: 2px solid #ffd700; background: rgba(10, 15, 25, 0.95); color: #ffffff; }
+
+.admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; color: #fff; }
+.admin-menu-item:hover { background-color: rgba(255,255,255,0.1); }
+.admin-menu-item.active { background-color: rgba(255,255,255,0.15); border-left: 4px solid #ffc107; font-weight: bold; color: #ffc107 !important; }
+
+.pay-radio { accent-color: #0d6efd; cursor: pointer; width: 18px; height: 18px; margin-right: 5px; vertical-align: middle; }
+[data-theme="dark"] .pay-radio { accent-color: #ffc107; }
+.pay-label { font-size: 1rem; cursor: pointer; vertical-align: middle; }
+
+.jackpot-banner { 
+  background: linear-gradient(45deg, #FFD700, #ff8c00); color: #000; 
+  text-align: center; padding: 15px; border-radius: 12px; 
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: glow 2s infinite alternate; 
+}
+
+/* =========================================
+   Cards, Tables, & Forms
+========================================= */
+.card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
+.card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
+.card-stats:hover { transform: translateY(-5px); }
+
+.table { color: var(--table-text); }
+.table-hover tbody tr:hover { color: var(--text-color); }
+
+.form-control, .form-select { 
+  background-color: var(--input-bg); color: var(--input-text); 
+  border-color: var(--card-border); color-scheme: light dark; 
+}
+.form-control:focus, .form-select:focus { background-color: var(--input-bg); color: var(--input-text); }
+[data-theme="dark"] ::placeholder { color: #888888 !important; opacity: 1; }
+
+/* Buttons */
+.theme-toggle-btn { 
+  cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); 
+  background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; 
+  gap: 5px; transition: 0.3s; 
+}
+.theme-toggle-btn:hover { background: var(--btn-hover-bg); }
+
+.btn-edit { color: var(--text-color); border: 1px solid var(--text-color); background: transparent; transition: 0.3s; }
+.btn-edit:hover { background: var(--text-color); color: var(--bg-color); }
+.btn-del { color: #dc3545; border: 1px solid #dc3545; background: transparent; transition: 0.3s; }
+.btn-del:hover { background: #dc3545; color: #fff; }
