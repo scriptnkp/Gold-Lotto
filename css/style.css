@@ -70,25 +70,37 @@ body {
   align-items:center; transition: background-color 0.3s; 
 }
 
+/* ปรับแต่ง Scrollbar ให้ดูสะอาดตาบน Desktop และไม่เกะกะบน Mobile */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #475569; }
+
 /* =========================================
    SweetAlert2 Customization
 ========================================= */
-.swal2-popup { background-color: var(--swal-bg) !important; color: var(--text-color) !important; }
-.swal2-title { color: var(--text-color) !important; }
+.swal2-popup { 
+  background-color: var(--swal-bg) !important; 
+  color: var(--text-color) !important; 
+  border-radius: 16px !important; /* ปรับขอบให้มนสวยขึ้น */
+  width: 95% !important; /* ป้องกันป๊อปอัพล้นจอในมือถือ */
+  max-width: 500px !important;
+}
+.swal2-title { color: var(--text-color) !important; font-size: 1.5rem !important; }
 .swal2-html-container { color: var(--text-color) !important; }
 .swal-edit-form { text-align: left; }
-.swal-edit-form label { font-size: 0.85rem; color: var(--text-label); margin-bottom: 2px; margin-top: 10px; display: block; }
+.swal-edit-form label { font-size: 0.85rem; color: var(--text-label); margin-bottom: 4px; margin-top: 12px; display: block; }
 
 /* =========================================
    Card Number Grid (กระดานเบอร์)
 ========================================= */
 .num-card { 
-  border: 1px solid var(--card-border); border-radius: 8px; 
+  border: 1px solid var(--card-border); border-radius: 10px; 
   background: var(--card-bg); overflow: hidden; text-align: center; 
-  position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+  position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.06); 
   transition: 0.2s; backdrop-filter: blur(5px); 
 }
-.num-card:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+.num-card:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.15); transform: translateY(-2px); }
 .num-header { 
   font-size: 1.8rem; font-weight: 900; padding: 10px 0; 
   background: var(--header-bg); color: var(--header-text); 
@@ -96,7 +108,7 @@ body {
   transition: background-color 0.3s, color 0.3s; 
 }
 .num-btn { 
-  width: 50%; padding: 8px 0; font-size: 0.9rem; cursor: pointer; 
+  width: 50%; padding: 10px 0; font-size: 0.9rem; cursor: pointer; 
   transition: 0.2s; background: transparent; color: var(--text-color); 
   border-top: 1px solid var(--card-border); 
 }
@@ -118,7 +130,7 @@ body {
 }
 @keyframes pulse { 0% { transform: scale(1) rotate(15deg); } 50% { transform: scale(1.1) rotate(15deg); } 100% { transform: scale(1) rotate(15deg); } }
 
-.booked-name { font-size: 0.65rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: var(--text-muted); }
+.booked-name { font-size: 0.7rem; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 5px; font-weight: normal; color: var(--text-muted); }
 .num-btn.booked .booked-name { color: #ffffff !important; text-decoration: line-through; }
 .num-btn.selected .booked-name { color: #ffffff !important; }
 
@@ -127,12 +139,13 @@ body {
 ========================================= */
 .booking-bar { 
   position: fixed; bottom: 0; left: 0; width: 100%; background: var(--bar-bg); 
-  color: var(--bar-text); padding: 10px 20px; z-index: 1000; 
-  box-shadow: 0 -4px 15px rgba(0,0,0,0.2); transition: 0.3s; 
+  color: var(--bar-text); padding: 12px 20px; z-index: 1000; 
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.15); transition: 0.3s; 
+  border-top-left-radius: 15px; border-top-right-radius: 15px;
 }
-[data-theme="dark"] .booking-bar { border-top: 2px solid #ffd700; background: rgba(10, 15, 25, 0.95); color: #ffffff; }
+[data-theme="dark"] .booking-bar { border-top: 2px solid #ffd700; background: rgba(10, 15, 25, 0.98); color: #ffffff; border-radius: 0; }
 
-.admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; color: #fff; }
+.admin-menu-item { cursor: pointer; transition: 0.2s; border-left: 4px solid transparent; color: #fff; border-radius: 0 8px 8px 0; margin-right: 10px; }
 .admin-menu-item:hover { background-color: rgba(255,255,255,0.1); }
 .admin-menu-item.active { background-color: rgba(255,255,255,0.15); border-left: 4px solid #ffc107; font-weight: bold; color: #ffc107 !important; }
 
@@ -149,25 +162,30 @@ body {
 /* =========================================
    Cards, Tables, & Forms
 ========================================= */
-.card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); }
+.card { background-color: var(--card-bg); border-color: var(--card-border); color: var(--text-color); border-radius: 12px; }
 .card-stats { border-left: 5px solid #0d6efd; transition: 0.3s; background: var(--card-bg); color: var(--text-color); border: 1px solid var(--card-border); }
 .card-stats:hover { transform: translateY(-5px); }
 
 .table { color: var(--table-text); }
+.table th { white-space: nowrap; } /* ป้องกันหัวตารางตัดบรรทัดบนมือถือ */
+.table td { vertical-align: middle; }
 .table-hover tbody tr:hover { color: var(--text-color); }
 
+/* ป้องกัน iOS ซูมหน้าจอเวลากดช่อง Input */
 .form-control, .form-select { 
   background-color: var(--input-bg); color: var(--input-text); 
   border-color: var(--card-border); color-scheme: light dark; 
+  font-size: 16px !important; /* สำคัญมากสำหรับ iPhone */
+  border-radius: 8px;
 }
-.form-control:focus, .form-select:focus { background-color: var(--input-bg); color: var(--input-text); }
+.form-control:focus, .form-select:focus { background-color: var(--input-bg); color: var(--input-text); box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); }
 [data-theme="dark"] ::placeholder { color: #888888 !important; opacity: 1; }
 
 /* Buttons */
 .theme-toggle-btn { 
-  cursor: pointer; padding: 5px 10px; border-radius: 20px; border: 1px solid var(--card-border); 
+  cursor: pointer; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--card-border); 
   background: var(--card-bg); color: var(--text-color); display: flex; align-items: center; 
-  gap: 5px; transition: 0.3s; 
+  gap: 5px; transition: 0.3s; font-weight: 500;
 }
 .theme-toggle-btn:hover { background: var(--btn-hover-bg); }
 
@@ -175,3 +193,36 @@ body {
 .btn-edit:hover { background: var(--text-color); color: var(--bg-color); }
 .btn-del { color: #dc3545; border: 1px solid #dc3545; background: transparent; transition: 0.3s; }
 .btn-del:hover { background: #dc3545; color: #fff; }
+
+/* =========================================
+   Mobile Optimization (Media Queries)
+========================================= */
+@media (max-width: 768px) {
+  /* ปรับแถบการจองด้านล่างให้กดง่ายขึ้น */
+  .booking-bar {
+    flex-direction: column; /* เปลี่ยนจากแนวนอนเป็นแนวตั้ง */
+    gap: 12px;
+    padding: 15px;
+    text-align: center;
+  }
+  .booking-bar > div { width: 100%; }
+  .booking-bar .btn-success {
+    width: 100%; /* ปุ่มยืนยันเต็มจอ กดยาวๆ ง่ายๆ */
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+  
+  /* ขยายพื้นที่ด้านล่างเผื่อแถบจองที่สูงขึ้น */
+  body { padding-bottom: 140px; }
+
+  /* ขยายจุด Touch ของปุ่มเลือกเบอร์ */
+  .num-btn { padding: 12px 0; }
+  .num-header { font-size: 1.5rem; }
+
+  /* ลดขนาด Font กล่องสถิติเพื่อไม่ให้ล้นจอ */
+  .card-stats h3 { font-size: 1.5rem; }
+  
+  /* Navbar ปรับให้ไอคอนไม่เบียด */
+  .navbar-brand { font-size: 1.2rem !important; }
+}
