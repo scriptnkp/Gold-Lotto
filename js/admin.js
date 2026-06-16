@@ -8,16 +8,21 @@ app.admin = {
   },
 
   switchAdminView: function(view) {
+    // 1. ซ่อนเนื้อหาของทุกหน้าต่าง
     document.getElementById('admin-view-dashboard').classList.add('hidden');
     document.getElementById('admin-view-users').classList.add('hidden');
     document.getElementById('admin-view-history').classList.add('hidden');
     document.getElementById('admin-view-allocation').classList.add('hidden');
+    document.getElementById('admin-view-topspenders').classList.add('hidden'); // [เพิ่มใหม่] หน้า Top Spenders
     
+    // 2. ลบสถานะ Active ออกจากเมนูทั้งหมด
     document.getElementById('menu-dashboard').classList.remove('active');
     document.getElementById('menu-users').classList.remove('active');
     document.getElementById('menu-history').classList.remove('active');
     document.getElementById('menu-allocation').classList.remove('active');
+    document.getElementById('menu-topspenders').classList.remove('active'); // [เพิ่มใหม่] เมนู Top Spenders
 
+    // 3. เปิดหน้าต่างและตั้งค่า Active ให้เมนูตามที่กดเลือก
     if(view === 'dashboard') {
       document.getElementById('admin-view-dashboard').classList.remove('hidden');
       document.getElementById('menu-dashboard').classList.add('active'); 
@@ -37,6 +42,15 @@ app.admin = {
       document.getElementById('menu-allocation').classList.add('active'); 
       app.history.loadHistoryData(true).then(() => app.allocation.updateAllocationStats());
     }
+    else if(view === 'topspenders') {
+      // [เพิ่มใหม่] เงื่อนไขสำหรับเปิดหน้า Top Spenders
+      document.getElementById('admin-view-topspenders').classList.remove('hidden');
+      document.getElementById('menu-topspenders').classList.add('active'); 
+      // ดึงข้อมูลประวัติทั้งหมดล่าสุด แล้วสั่งวาดหน้า Top Spenders ตลอดกาล
+      app.history.loadHistoryData(true).then(() => app.topspenders.renderOverallTop());
+    }
+
+    // 4. ปิดแถบเมนูด้านข้าง (Offcanvas) อัตโนมัติเมื่อกดเลือกเมนู (สำหรับมือถือ)
     const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('adminMenu'));
     if(offcanvas) offcanvas.hide();
   },

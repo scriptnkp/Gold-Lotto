@@ -44,6 +44,10 @@ app.history = {
         filteredData = app.global.globalHistoryData.filter(h => h.drawDate === selected);
     }
 
+    // --- ส่วนที่เพิ่มใหม่: เรียกใช้ฟังก์ชันประมวลผล Top 3 ---
+    this.renderTopSpenders(filteredData);
+    // ------------------------------------------------
+
     let totalPaid = 0;
     let totalUnpaid = 0;
 
@@ -155,5 +159,49 @@ app.history = {
         } else Swal.fire('ผิดพลาด', res.message, 'error');
       }
     });
+  },
+
+  // --- ส่วนที่เพิ่มใหม่: ฟังก์ชันคำนวณและแสดงผล Top 3 สายเปย์ ---
+  renderTopSpenders: function(data) {
+    const container = document.getElementById('top-3-cards');
+    if (!container) return;
+
+    // 1. จัดกลุ่ม (Group By) และรวมยอดเงิน (Sum Amount) ตามชื่อ
+    const spenders = {};
+    data.forEach(h => {
+      if(!spenders[h.name]) spenders[h.name] = 0;
+      spenders[h.name] += Number(h.amount) || 0;
+    });
+
+    // 2. แปลงเป็น Array แล้วจัดเรียงจากมากไปน้อย (Sort Descending)
+    const sortedSpenders = Object.keys(spenders)
+      .map(name => ({ name: name, total: spenders[name] }))
+      .sort((a, b) => b.total - a.total);
+
+    // 3. ตัดมาเฉพาะ Top 3
+    const top3 = sortedSpenders.slice(0, 3);
+
+    // 4. สร้าง UI
+    if(top3.length === 0) {
+      container.innerHTML = `<div class="col-12 text-muted small">ยังไม่มีข้อมูลการจองในงวดนี้</div>`;
+      return;
+    }
+
+    const rankClasses = ['rank-1', 'rank-2', 'rank-3'];
+    const rankIcons = ['<i class="bi bi-trophy-fill"></i>', '<i class="bi bi-award-fill"></i>', '<i class="bi bi-star-fill"></i>'];
+
+    container.innerHTML = top3.map((user, index) => `
+      <div class="col-12 col-md-4">
+        <div class="card p-3 ranking-card ${rankClasses[index]}">
+          <div class="rank-badge-bg">${index + 1}</div>
+          <small class="fw-bold mb-1">${rankIcons[index]} อันดับที่ ${index + 1}</small>
+          <h5 class="fw-bold text-truncate mb-2" style="max-width: 90%;" title="${user.name}">${user.name}</h5>
+          <div class="mt-auto border-top pt-2" style="border-color: rgba(0,0,0,0.1) !important;">
+            <small class="opacity-75">ยอดรวม</small>
+            <h4 class="mb-0 fw-bold">${user.total.toLocaleString()} ฿</h4>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 };
