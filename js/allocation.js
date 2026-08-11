@@ -18,7 +18,7 @@ app.allocation = {
     const startSelect = document.getElementById('alloc-start-draw');
     const endSelect = document.getElementById('alloc-end-draw');
     
-    // ดึงรายชื่องวดที่ไม่ซ้ำ และกรองค่าว่างออก (เรียงจากใหม่สุด ไป เก่าสุด ตาม History)
+    // ดึงรายชื่องวดที่ไม่ซ้ำ และกรองค่าว่างออก
     const uniqueDraws = [...new Set(app.global.globalHistoryData.map(h => h.drawDate))].filter(d => d && d !== "-");
     
     if(startSelect && startSelect.options.length === 0 && uniqueDraws.length > 0) {
@@ -32,7 +32,7 @@ app.allocation = {
         startSelect.innerHTML = options;
         endSelect.innerHTML = options;
         
-        // ค่าเริ่มต้น: ให้ช่องซ้าย(start) เป็นงวดเก่าสุด (index ท้ายสุด) และ ช่องขวา(end) เป็นงวดใหม่สุด (index 0)
+        // ค่าเริ่มต้น: ให้ช่องซ้าย(start) เป็นงวดเก่าสุด และ ช่องขวา(end) เป็นงวดใหม่สุด
         startSelect.selectedIndex = uniqueDraws.length - 1;
         endSelect.selectedIndex = 0;
     }
@@ -44,7 +44,7 @@ app.allocation = {
     const startVal = startSelect ? startSelect.value : '';
     const endVal = endSelect ? endSelect.value : '';
 
-    // 1. คัดกรองข้อมูลตามช่วงงวด โดยอิงจาก "ลำดับ (Index)" แทนการแปลงวันที่ เพื่อแก้บั๊กรูปแบบวันที่
+    // 1. คัดกรองข้อมูลตามช่วงงวด โดยอิงจากลำดับ (Index)
     if (uniqueDraws.length > 0 && startVal && endVal) {
         let idxStart = uniqueDraws.indexOf(startVal);
         let idxEnd = uniqueDraws.indexOf(endVal);
@@ -118,34 +118,35 @@ app.allocation = {
 
     if (netProfit <= 0 && sales <= 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'warning');
 
-    let locationCounts = {};
-    let totalTickets = 0;
+    let locationSales = {};
+    let totalAllocatedSales = 0;
 
-    // นับส่วนแบ่งจากกระดานปัจจุบัน
+    // นับยอดเงินจากกระดานปัจจุบัน
     if (document.getElementById('alloc-include-current') && document.getElementById('alloc-include-current').checked) {
         app.global.globalBookedGroups.forEach(g => {
             let user = app.global.globalAllUsers.find(u => String(u.name) === String(g.name));
             let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
-            let ticketsCount = g.topNums.length + g.botNums.length;
-            totalTickets += ticketsCount;
-            if(!locationCounts[loc]) locationCounts[loc] = 0;
-            locationCounts[loc] += ticketsCount;
+            let amount = Number(g.totalPrice) || 0;
+            
+            totalAllocatedSales += amount;
+            if(!locationSales[loc]) locationSales[loc] = 0;
+            locationSales[loc] += amount;
         });
     }
 
-    // นับส่วนแบ่งจากประวัติที่คัดกรองงวดมาแล้ว
+    // นับยอดเงินจากประวัติที่คัดกรองงวดมาแล้ว
     const filteredHistory = this.currentFilteredHistory || [];
     filteredHistory.forEach(h => {
         let user = app.global.globalAllUsers.find(u => String(u.name) === String(h.name));
         let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
-        let ticketsCount = 0;
-        if(h.numbers) { ticketsCount = h.numbers.split(',').filter(n => n.trim() !== '').length; }
-        totalTickets += ticketsCount;
-        if(!locationCounts[loc]) locationCounts[loc] = 0;
-        locationCounts[loc] += ticketsCount;
+        let amount = Number(h.amount) || 0;
+        
+        totalAllocatedSales += amount;
+        if(!locationSales[loc]) locationSales[loc] = 0;
+        locationSales[loc] += amount;
     });
 
-    if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
+    if(totalAllocatedSales === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลยอดเงินในงวดที่เลือก', 'info');
 
     let html = `
     <div class="alert alert-secondary border-secondary mb-4 shadow-sm" style="background-color: var(--card-bg);">
@@ -159,24 +160,25 @@ app.allocation = {
     </div>
     <div class="row g-3">`;
 
-    for(let loc in locationCounts) {
-        let count = locationCounts[loc];
-        let percent = (count / totalTickets) * 100;
-        let share = (count / totalTickets) * netProfit;
+    // วาด Card แต่ละพื้นที่พร้อมแสดง ยอดขาย (บาท) และสัดส่วน % ที่ถูกต้อง
+    for(let loc in locationSales) {
+        let locSalesAmount = locationSales[loc];
+        let percent = (locSalesAmount / totalAllocatedSales) * 100;
+        let share = (locSalesAmount / totalAllocatedSales) * netProfit;
 
         html += `
         <div class="col-12 col-md-6">
             <div class="card p-3 shadow-sm border-start border-info border-4" style="background-color: var(--card-bg);">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 class="text-info fw-bold mb-0"><i class="bi bi-geo-alt-fill"></i> ${loc}</h5>
-                    <!-- ปุ่มกดเปลี่ยนสถานะรับเงิน (เริ่มจากค้างจ่ายเสมอ) -->
+                    <!-- ปุ่มกดเปลี่ยนสถานะรับเงิน -->
                     <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="app.allocation.toggleLocationStatus(this)" title="คลิกเพื่อเปลี่ยนสถานะ">
                         <i class="bi bi-exclamation-circle-fill"></i> ค้างจ่าย
                     </button>
                 </div>
                 
                 <div class="d-flex justify-content-between text-muted small mb-1 lbl-bright">
-                    <span>ยอดขายรวม: <b>${count}</b> รายการ</span>
+                    <span>ยอดขายรวม: <b>${locSalesAmount.toLocaleString()}</b> บาท</span>
                     <span>สัดส่วน: <b>${percent.toFixed(2)}%</b></span>
                 </div>
                 
