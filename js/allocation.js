@@ -1,26 +1,71 @@
 // ==================== js/allocation.js ====================
 
 app.allocation = {
+  // ฟังก์ชันลูกเล่นสำหรับปุ่ม ค้างจ่าย / จ่ายแล้ว
+  toggleLocationStatus: function(btnElement) {
+    if (btnElement.classList.contains('btn-danger')) {
+        btnElement.classList.remove('btn-danger');
+        btnElement.classList.add('btn-success');
+        btnElement.innerHTML = '<i class="bi bi-check-circle-fill"></i> จ่ายแล้ว';
+    } else {
+        btnElement.classList.remove('btn-success');
+        btnElement.classList.add('btn-danger');
+        btnElement.innerHTML = '<i class="bi bi-exclamation-circle-fill"></i> ค้างจ่าย';
+    }
+  },
+
   updateAllocationStats: function() {
-    const drawSelect = document.getElementById('allocation-draw-select');
+    const startSelect = document.getElementById('alloc-start-draw');
+    const endSelect = document.getElementById('alloc-end-draw');
     
-    if(drawSelect.options.length <= 1 && app.global.globalHistoryData.length > 0) {
-        const uniqueDraws = [...new Set(app.global.globalHistoryData.map(h => h.drawDate))];
-        let options = '<option value="current">งวดปัจจุบัน (กระดานปัจจุบัน)</option>';
+    // ดึงรายชื่องวดที่ไม่ซ้ำ และกรองค่าว่างออก (เรียงจากใหม่สุด ไป เก่าสุด ตาม History)
+    const uniqueDraws = [...new Set(app.global.globalHistoryData.map(h => h.drawDate))].filter(d => d && d !== "-");
+    
+    if(startSelect && startSelect.options.length === 0 && uniqueDraws.length > 0) {
+        let options = '';
         uniqueDraws.forEach(d => {
             let display = d;
-            if(display.length > 20) { try { display = app.main.formatThaiDateTime(d); } catch(e) {} }
+            if(display.length > 10) { try { display = app.main.formatThaiDateTime(d); } catch(e) {} }
             options += `<option value="${d}">${display}</option>`;
         });
-        drawSelect.innerHTML = options;
+        
+        startSelect.innerHTML = options;
+        endSelect.innerHTML = options;
+        
+        // ค่าเริ่มต้น: ให้ช่องซ้าย(start) เป็นงวดเก่าสุด (index ท้ายสุด) และ ช่องขวา(end) เป็นงวดใหม่สุด (index 0)
+        startSelect.selectedIndex = uniqueDraws.length - 1;
+        endSelect.selectedIndex = 0;
     }
 
-    const selected = drawSelect.value || 'current';
     let totalSales = 0;
     let totalPayouts = 0;
+    let filteredHistory = [];
 
-    if (selected === 'current') {
-        totalSales = app.global.globalBookedGroups.reduce((sum, g) => sum + g.totalPrice, 0);
+    const startVal = startSelect ? startSelect.value : '';
+    const endVal = endSelect ? endSelect.value : '';
+
+    // 1. คัดกรองข้อมูลตามช่วงงวด โดยอิงจาก "ลำดับ (Index)" แทนการแปลงวันที่ เพื่อแก้บั๊กรูปแบบวันที่
+    if (uniqueDraws.length > 0 && startVal && endVal) {
+        let idxStart = uniqueDraws.indexOf(startVal);
+        let idxEnd = uniqueDraws.indexOf(endVal);
+        
+        if (idxStart !== -1 && idxEnd !== -1) {
+            let minIdx = Math.min(idxStart, idxEnd);
+            let maxIdx = Math.max(idxStart, idxEnd);
+            
+            filteredHistory = app.global.globalHistoryData.filter(h => {
+                let idx = uniqueDraws.indexOf(h.drawDate);
+                return idx >= minIdx && idx <= maxIdx;
+            });
+            
+            totalSales += filteredHistory.reduce((sum, h) => sum + (Number(h.amount) || 0), 0);
+            totalPayouts += filteredHistory.reduce((sum, h) => sum + (Number(h.prize) || 0), 0);
+        }
+    }
+
+    // 2. รวมยอดจากกระดานปัจจุบันด้วย (ถ้าติ๊กเลือก)
+    if (document.getElementById('alloc-include-current') && document.getElementById('alloc-include-current').checked) {
+        totalSales += app.global.globalBookedGroups.reduce((sum, g) => sum + g.totalPrice, 0);
         let winTop = document.getElementById('input-win-top').value;
         let winBot = document.getElementById('input-win-bot').value;
         if(winTop.length === 1) winTop = '0' + winTop;
@@ -31,15 +76,14 @@ app.allocation = {
             if (winTop && g.topNums.includes(winTop)) winnersCount++;
             if (winBot && g.botNums.includes(winBot)) winnersCount++;
         });
-        totalPayouts = winnersCount * 6000;
-    } else {
-        const histForDraw = app.global.globalHistoryData.filter(h => h.drawDate === selected);
-        totalSales = histForDraw.reduce((sum, h) => sum + h.amount, 0);
-        totalPayouts = histForDraw.reduce((sum, h) => sum + (h.prize || 0), 0);
+        totalPayouts += (winnersCount * 6000);
     }
 
     document.getElementById('allocation-total-sales').value = totalSales;
     document.getElementById('allocation-payouts').value = totalPayouts;
+    
+    // เก็บประวัติที่คัดกรองแล้วไว้คำนวณตอนกดปุ่ม
+    this.currentFilteredHistory = filteredHistory;
     this.updateAllocationNetProfit();
   },
 
@@ -63,9 +107,7 @@ app.allocation = {
   },
 
   calculateAllocation: function() {
-    const selected = document.getElementById('allocation-draw-select').value || 'current';
     const netProfit = parseFloat(document.getElementById('allocation-net-profit').value) || 0;
-    
     const sales = parseFloat(document.getElementById('allocation-total-sales').value) || 0;
     const payouts = parseFloat(document.getElementById('allocation-payouts').value) || 0;
     const reservePct = parseFloat(document.getElementById('allocation-reserve-pct').value) || 0;
@@ -74,12 +116,13 @@ app.allocation = {
     let reserveAmount = 0;
     if(grossProfit > 0) reserveAmount = grossProfit * (reservePct / 100);
 
-    if (netProfit < 0) return Swal.fire('แจ้งเตือน', 'กำไรสุทธิติดลบ ไม่สามารถคำนวณส่วนแบ่งได้', 'warning');
+    if (netProfit <= 0 && sales <= 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'warning');
 
     let locationCounts = {};
     let totalTickets = 0;
 
-    if (selected === 'current') {
+    // นับส่วนแบ่งจากกระดานปัจจุบัน
+    if (document.getElementById('alloc-include-current') && document.getElementById('alloc-include-current').checked) {
         app.global.globalBookedGroups.forEach(g => {
             let user = app.global.globalAllUsers.find(u => String(u.name) === String(g.name));
             let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
@@ -88,18 +131,19 @@ app.allocation = {
             if(!locationCounts[loc]) locationCounts[loc] = 0;
             locationCounts[loc] += ticketsCount;
         });
-    } else {
-        const histForDraw = app.global.globalHistoryData.filter(h => h.drawDate === selected);
-        histForDraw.forEach(h => {
-            let user = app.global.globalAllUsers.find(u => String(u.name) === String(h.name));
-            let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
-            let ticketsCount = 0;
-            if(h.numbers) { ticketsCount = h.numbers.split(',').filter(n => n.trim() !== '').length; }
-            totalTickets += ticketsCount;
-            if(!locationCounts[loc]) locationCounts[loc] = 0;
-            locationCounts[loc] += ticketsCount;
-        });
     }
+
+    // นับส่วนแบ่งจากประวัติที่คัดกรองงวดมาแล้ว
+    const filteredHistory = this.currentFilteredHistory || [];
+    filteredHistory.forEach(h => {
+        let user = app.global.globalAllUsers.find(u => String(u.name) === String(h.name));
+        let loc = (user && user.location && user.location !== "") ? user.location : 'ไม่ระบุ';
+        let ticketsCount = 0;
+        if(h.numbers) { ticketsCount = h.numbers.split(',').filter(n => n.trim() !== '').length; }
+        totalTickets += ticketsCount;
+        if(!locationCounts[loc]) locationCounts[loc] = 0;
+        locationCounts[loc] += ticketsCount;
+    });
 
     if(totalTickets === 0) return Swal.fire('แจ้งเตือน', 'ไม่มีข้อมูลการจองในงวดที่เลือก', 'info');
 
@@ -123,11 +167,19 @@ app.allocation = {
         html += `
         <div class="col-12 col-md-6">
             <div class="card p-3 shadow-sm border-start border-info border-4" style="background-color: var(--card-bg);">
-                <h5 class="text-info fw-bold mb-2"><i class="bi bi-geo-alt-fill"></i> ${loc}</h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="text-info fw-bold mb-0"><i class="bi bi-geo-alt-fill"></i> ${loc}</h5>
+                    <!-- ปุ่มกดเปลี่ยนสถานะรับเงิน (เริ่มจากค้างจ่ายเสมอ) -->
+                    <button class="btn btn-sm btn-danger fw-bold shadow-sm" onclick="app.allocation.toggleLocationStatus(this)" title="คลิกเพื่อเปลี่ยนสถานะ">
+                        <i class="bi bi-exclamation-circle-fill"></i> ค้างจ่าย
+                    </button>
+                </div>
+                
                 <div class="d-flex justify-content-between text-muted small mb-1 lbl-bright">
                     <span>ยอดขายรวม: <b>${count}</b> รายการ</span>
                     <span>สัดส่วน: <b>${percent.toFixed(2)}%</b></span>
                 </div>
+                
                 <h3 class="text-success mb-0 fw-bold mt-2 border-top pt-2" style="border-color: var(--card-border) !important;">
                     ส่วนแบ่ง: ${share.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ฿
                 </h3>
